@@ -164,7 +164,7 @@ export const team = [
       { name: 'Ella Moon', photo: 'media/team/ella.jpg', role: 'Chief Finance Officer', duty: 'Owns the budget, reimbursements and DVCSync paperwork.' },
       { name: 'Micah Iswaranata', photo: 'media/team/micah.jpg', role: 'Secretary', duty: 'Meeting notes, attendance and leadership records.' },
       { name: 'Frisko Natan Gautama', wheel: 'Frisko Gautama', photo: 'media/team/frisko.jpg', role: 'ICC Representative', duty: 'All communication and deadlines with DVC student government.' },
-      { name: 'Suyeon Kim', role: 'Marketing Lead / CMO', duty: 'Keeps GDG’s digital identity — Instagram and social design.' },
+      { name: 'Suyeon Kim', photo: 'media/team/suyeon.jpg', role: 'Marketing Lead / CMO', duty: 'Keeps GDG’s digital identity — Instagram and social design.' },
     ],
   },
   {
