@@ -31,6 +31,25 @@ function Barcode({ seed }) {
   return <svg className="pass__barcode" width="104" height="44" viewBox="0 0 104 44" aria-hidden>{bars}</svg>
 }
 
+// 每个人自己的"像素 ID"：3×3 的小像素图案，按名字算出来、左右对称（同一个人每次都一样），亮的格子用部门色；
+// 换人时按顺序一格一格亮起，像读卡
+function PixelId({ seed, tone }) {
+  let h = 7
+  for (const ch of seed) h = (h * 131 + ch.charCodeAt(0)) >>> 0
+  const cells = []
+  for (let r = 0; r < 3; r++) {
+    for (let c = 0; c < 3; c++) {
+      const col = c === 2 ? 0 : c // 第三列和第一列一样 → 左右对称
+      cells.push(((h >>> (r * 2 + col + 3)) & 1) === 1 || (r === 1 && c === 1))
+    }
+  }
+  return (
+    <i className={`pid pid--${tone}`} aria-hidden>
+      {cells.map((on, k) => <b key={k} className={on ? 'on' : ''} style={{ '--k': k }} />)}
+    </i>
+  )
+}
+
 // 团队：左侧 OptionWheel 弧形名单（带滚动音效），中间成员像素墙，右侧选中成员的干部证（票根可以撕下来）
 // 三者联动：名单 / 像素墙 / 部门切换任意一个变了，其它跟着换人
 export default function Team() {
@@ -218,17 +237,15 @@ export default function Team() {
             onTear={() => setTorn((t) => new Set(t).add(m.name))}
             ariaLabel={`Tear the stub off ${m.name}'s pass`}
             stub={
-              // 票根：和原版 "Admit one / 地点 · 日期 / No." 同一种排法
+              // 票根：上面一行是社团名 + 部门（右边条形码），下面一行是编号和年度（右边 tear ↓），左边缘、上下基准线都对齐
               <div className="pass__stub">
-                <div className="pass__admit">
-                  <h4>Officer pass</h4>
-                  <p>{m.division.name}</p>
-                  <span className="code">No. {pad(shown + 1)}/{pad(members.length)} · 2026–27</span>
+                <div className="pass__title">
+                  <span>GDG on Campus DVC</span>
+                  <strong>{m.division.name}</strong>
                 </div>
-                <div className="pass__stub-side">
-                  <Barcode seed={m.name} />
-                  <span className="code">tear ↓</span>
-                </div>
+                <Barcode seed={m.name} />
+                <span className="pass__meta-line code">{pad(shown + 1)}/{pad(members.length)} · 2026–27</span>
+                <span className="pass__tear code">tear ↓</span>
               </div>
             }
           >
@@ -239,7 +256,7 @@ export default function Team() {
             )}
             {/* 正文：只放名字，压在照片底部的渐变上（原版示例的 <span>Spectrum</span>） */}
             <div className="pass__info">
-              <p className="pass__role code"><i className={`c-${m.division.color}`}>●</i> {m.role}</p>
+              <p className="pass__role"><PixelId key={m.name} seed={m.name} tone={m.division.color} /><span>{m.role}</span></p>
               <h3>{m.name}</h3>
               <p className="pass__duty">{m.duty}</p>
             </div>
