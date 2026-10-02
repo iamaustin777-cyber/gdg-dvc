@@ -1,6 +1,6 @@
 # GDG on Campus DVC
 
-Website of Google Developer Groups on Campus at Diablo Valley College — https://iamaustin777-cyber.github.io/gdg-dvc/
+Website of Google Developer Groups on Campus at Diablo Valley College — https://gdg-dvc.web.app/
 
 ```bash
 npm install
@@ -8,7 +8,7 @@ npm run dev     # http://localhost:5173
 npm run build   # production build in dist/
 ```
 
-Pushing to `main` deploys to GitHub Pages (`.github/workflows/deploy.yml`).
+Hosted on Firebase Hosting (project `gdg-dvc`). Deploy with `npm run deploy` (needs `npx firebase login` once).
 
 - Chapter globe data: `python3 scripts/build-globe-data.py <chapters.json> <land-110m.json>` (sources listed in the script).
 - Google campus photos are from Wikimedia Commons under CC BY-SA 4.0; attribution is shown with each photo.
