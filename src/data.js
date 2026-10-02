@@ -352,6 +352,12 @@ Object.assign(photos, {
 const unsplash = (id, w = 1600) => `https://images.unsplash.com/photo-${id}?w=${w}&q=80&auto=format&fit=crop`
 const UNSPLASH_LICENSE = { label: 'Unsplash', href: 'https://unsplash.com/license' } // 署名写短一点，窄卡片里不会折行
 Object.assign(photos, {
+  googleAustin: {
+    src: commons('c/cc/Google_Tower_Austin%2C_Texas.jpg', 1280),
+    alt: 'Google’s tower in downtown Austin, Texas',
+    credit: 'Sk5893',
+    href: 'https://commons.wikimedia.org/wiki/File:Google_Tower_Austin,_Texas.jpg',
+  },
   hackathonNight: {
     src: unsplash('1504384764586-bb4cdc1707b0'),
     alt: 'Developers coding on laptops late at night at a hackathon, lit in purple',
@@ -425,7 +431,7 @@ Object.assign(photos, {
 // Events 里的照片墙：全球 GDG 社区 + 谷歌园区
 export const gallery = [
   { photo: 'hackathonRoom', caption: 'Hack night' },
-  { photo: 'googleNeon', caption: 'Google, in neon' },
+  { photo: 'googleAustin', caption: 'Google Tower · Austin, Texas' },
   { photo: 'googleNight', caption: 'Google, after dark' },
   { photo: 'waymo', caption: 'Waymo self-driving car · San Francisco' },
 ]
