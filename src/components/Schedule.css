@@ -1,0 +1,100 @@
+/* 新版活动日程（Schedule.jsx）——只作用于 .sched，不影响网站其它部分 */
+.sched {
+  --hair: rgba(255, 255, 255, 0.08);
+  --title: #e8eaed;
+  --body: #9aa0a6;
+  --meta: #5f6368;
+  --ease: cubic-bezier(0.2, 0.7, 0.1, 1);
+  --draw: cubic-bezier(0.65, 0, 0.35, 1);
+  position: relative; display: grid; grid-template-columns: repeat(4, 1fr); margin-top: 160px; list-style: none;
+}
+/* 品牌色：细线 / 色块用标准色，文字用 Google 暗色模式的浅色版（在深底上更易读） */
+.sched .t-blue { --c: #4285f4; --c-text: #8ab4f8; }
+.sched .t-red { --c: #ea4335; --c-text: #f28b82; }
+.sched .t-yellow { --c: #fbbc04; --c-text: #fdd663; }
+.sched .t-green { --c: #34a853; --c-text: #81c995; }
+
+/* 鼠标附近点阵亮起：同样 28px 的点阵，只在鼠标周围露出来，点本身变亮而不是发光 */
+.sched::after {
+  content: ''; position: absolute; inset: -40px; z-index: 0; pointer-events: none;
+  background: radial-gradient(rgba(138, 180, 248, 0.38) 1px, transparent 1.3px) 0 0 / 28px 28px;
+  -webkit-mask: radial-gradient(170px circle at calc(var(--mx, -999px) + 40px) calc(var(--my, -999px) + 40px), #000, transparent 70%);
+  mask: radial-gradient(170px circle at calc(var(--mx, -999px) + 40px) calc(var(--my, -999px) + 40px), #000, transparent 70%);
+}
+
+/* 每一列：用细线分隔（借用背景网格的结构），顶部一条 2px 品牌色短线 */
+.sched__col {
+  position: relative; z-index: 1; display: flex; flex-direction: column; padding: 28px 28px 32px;
+  transition: opacity 0.28s var(--ease), background-color 0.28s var(--ease);
+}
+.sched__col + .sched__col { border-left: 1px solid var(--hair); }
+.sched__col::before {
+  content: ''; position: absolute; left: 0; right: 0; top: 0; height: 2px; background: var(--c);
+  clip-path: inset(0 calc(100% - 24px) 0 0); /* 平时 24px 短线 */
+  transform: scaleX(0); transform-origin: 0 50%;
+  transition: clip-path 0.45s var(--ease), transform 0.7s var(--draw);
+  transition-delay: 0s, calc(var(--i) * 90ms);
+}
+.sched__col.is-next::before { clip-path: inset(0 0 0 0); } /* 下一场：色线拉满整列 */
+
+/* 进场：线先画出，再依次出现日期、标题、正文 */
+.sched__head, .sched__meta, .sched__title, .sched__text {
+  opacity: 0; transform: translateY(12px);
+  transition: opacity 0.6s var(--ease), transform 0.7s var(--ease);
+}
+.sched.is-in .sched__col::before { transform: scaleX(1); }
+.sched.is-in .sched__head { opacity: 1; transform: none; transition-delay: calc(var(--i) * 90ms + 120ms); }
+.sched.is-in .sched__meta { opacity: 1; transform: none; transition-delay: calc(var(--i) * 90ms + 160ms); }
+.sched.is-in .sched__title { opacity: 1; transform: none; transition-delay: calc(var(--i) * 90ms + 200ms); }
+.sched.is-in .sched__text { opacity: 1; transform: none; transition-delay: calc(var(--i) * 90ms + 260ms); }
+
+/* 日期两层：大号日期 + 星期 · 时间 · 地点 */
+.sched__head { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+.sched__date {
+  font-family: 'Geist Mono', ui-monospace, monospace; font-size: 40px; font-weight: 500; letter-spacing: -0.04em; line-height: 1;
+  font-variant-numeric: tabular-nums; color: var(--c-text);
+}
+.sched__date-small { font-size: 13px; letter-spacing: 0; color: var(--meta); vertical-align: 0.9em; margin-right: 2px; }
+.sched__meta { margin-top: 12px; font: 500 12px/1.4 'Geist Mono', ui-monospace, monospace; letter-spacing: 0; color: var(--meta); }
+.sched__badge {
+  flex: none; padding: 1px 6px; border: 1px solid rgba(255, 255, 255, 0.12); border-radius: 4px;
+  font: 500 11px/1.5 'Geist Mono', ui-monospace, monospace; color: var(--meta);
+}
+.sched__badge--next { border-color: transparent; color: var(--c-text); background: color-mix(in srgb, var(--c) 12%, transparent); }
+
+/* 标题至少占两行，四列正文起点对齐 */
+.sched__title {
+  margin-top: 26px; min-height: 2.24em; font-family: 'Google Sans', 'Geist', sans-serif; font-size: clamp(24px, 1.9vw, 30px);
+  font-weight: 500; letter-spacing: -0.03em; line-height: 1.12; color: var(--title); text-wrap: balance;
+}
+.sched__text { margin-top: 12px; max-width: 34ch; font-size: 15.5px; line-height: 1.55; color: var(--body); }
+
+/* 已结束：整列压暗 */
+.sched__col.is-done { opacity: 0.55; }
+
+/* 悬停：当前列聚焦（底色微微提亮、色线拉满），其它列变暗 */
+.sched:has(.sched__col:hover) .sched__col:not(:hover) { opacity: 0.4; }
+.sched__col:hover { opacity: 1; background-color: rgba(255, 255, 255, 0.025); }
+.sched__col:hover::before { clip-path: inset(0 0 0 0); }
+
+/* 悬停出现"加到 Google 日历" */
+.sched__cal {
+  margin-top: auto; padding-top: 22px; align-self: flex-start; font: 500 12.5px/1 'Geist Mono', ui-monospace, monospace;
+  color: var(--c-text); text-decoration: none; opacity: 0; transform: translateY(4px); transition: opacity 0.2s, transform 0.2s var(--ease);
+}
+.sched__col:hover .sched__cal, .sched__cal:focus-visible { opacity: 1; transform: none; }
+.sched__cal:hover { text-decoration: underline; text-underline-offset: 3px; }
+
+@media (max-width: 1280px) {
+  .sched { grid-template-columns: repeat(2, 1fr); }
+  .sched__col:nth-child(3) { border-left: 0; }
+  .sched__col:nth-child(n + 3) { border-top: 1px solid var(--hair); }
+}
+@media (max-width: 860px) {
+  .sched { grid-template-columns: 1fr; }
+  .sched__col + .sched__col { border-left: 0; border-top: 1px solid var(--hair); }
+  .sched__cal { opacity: 1; transform: none; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .sched__col::before, .sched__head, .sched__meta, .sched__title, .sched__text { transition: none; transform: none; opacity: 1; }
+}

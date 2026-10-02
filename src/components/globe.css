@@ -1,0 +1,84 @@
+/* Worldwide：点阵地球 + 按地区的分部数。没有卡片和外框，地区就是几行大字 */
+.ww {
+  --hair: rgba(255, 255, 255, 0.08);
+  --spring: cubic-bezier(0.32, 0.72, 0, 1);
+  display: grid; grid-template-columns: minmax(0, 1.15fr) minmax(0, 1fr); align-items: center; gap: clamp(40px, 6vw, 112px);
+  margin-top: 72px;
+}
+
+/* 地球：正方形画布；数据到了之后淡入 */
+.ww__stage { position: relative; width: 100%; max-width: 640px; justify-self: center; }
+.globe { display: block; width: 100%; aspect-ratio: 1; touch-action: pan-y; opacity: 0; transition: opacity .8s var(--spring); }
+.globe.is-ready { opacity: 1; }
+
+/* 地球下面一行：左边状态，右边缩放 */
+.ww__bar { display: flex; align-items: center; justify-content: space-between; gap: 16px; min-height: 28px; margin-top: 14px; color: var(--text-3); }
+.ww__status { min-width: 0; }
+.ww__status button {
+  display: inline-flex; align-items: center; gap: 10px; max-width: 100%; padding: 2px 0; font: inherit; color: var(--text-2);
+  background: none; border: 0; cursor: pointer; animation: wwSwap .3s var(--spring);
+}
+.ww__status i { flex: none; width: 7px; height: 7px; border-radius: 1px; }
+.ww__name { color: #e8eaed; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.ww__city { white-space: nowrap; }
+.ww__go { color: var(--text-3); transition: color .2s; }
+.ww__status button:hover .ww__go { color: #e8eaed; }
+.ww__idle b { font-weight: inherit; }
+@keyframes wwSwap { from { opacity: 0; transform: translateY(4px); } to { opacity: 1; transform: none; } }
+
+/* 缩放：三个等宽小字按钮，没有外框 */
+.ww__zoom { flex: none; display: flex; align-items: center; }
+.ww__zoom button {
+  min-width: 28px; height: 28px; padding: 0 4px; font: inherit; font-size: 14px; color: var(--text-2); background: none; border: 0; border-radius: 6px;
+  cursor: pointer; font-variant-numeric: tabular-nums; transition: color .2s, background-color .2s;
+}
+.ww__zoom .ww__level { min-width: 46px; font-size: 12.5px; color: #e8eaed; }
+.ww__zoom button:hover:not(:disabled) { color: #fff; background: rgba(255, 255, 255, .06); }
+.ww__zoom button:disabled { color: var(--text-3); cursor: default; }
+.ww__zoom .ww__level:disabled { color: var(--text-2); }
+.ww__zoom button:focus-visible { outline: 1px solid rgba(255, 255, 255, .5); outline-offset: 1px; }
+
+/* 右侧 */
+.ww__home { display: flex; align-items: center; gap: 12px; font-size: 14.5px; color: var(--text-2); }
+.ww__home .pix4 { grid-template-columns: 5px 5px; gap: 2px; }
+.ww__home .pix4 b { width: 5px; height: 5px; }
+.ww__home strong { font-weight: 500; color: #e8eaed; }
+
+/* 像素方格：一格 = 10 个分部，一列一列往下填，同一地区连成一块 */
+.ww__grid { display: grid; grid-template-rows: repeat(var(--rows), 10px); grid-auto-flow: column; grid-auto-columns: 10px; gap: 4px; margin-top: 36px; }
+/* 每个地区一种颜色（和地球上的点一致）；正在看一个地区时，其它地区的格子变暗 */
+.ww__grid i { border-radius: 2px; background: var(--c); transition: background-color .35s var(--spring), opacity .35s var(--spring); }
+.ww__grid i.is-gap { visibility: hidden; }
+.ww__side.has-on .ww__grid i { opacity: .16; }
+.ww__side.has-on .ww__grid i.is-on { opacity: 1; }
+/* 进场动画只在开始前生效（backwards），播完就不再占着 opacity，选中地区时的变暗才能起作用 */
+.ww.is-in .ww__grid i { animation: wwCell .5s var(--spring) backwards; animation-delay: calc(var(--k) * 4ms); }
+@keyframes wwCell { from { opacity: 0; transform: scale(.3); } to { opacity: 1; transform: none; } }
+.ww__key { display: flex; align-items: center; gap: 8px; margin-top: 14px; color: var(--text-3); }
+.ww__key i { width: 10px; height: 10px; border-radius: 2px; background: var(--text-2); }
+
+/* 一句话：数字和地区是可以点的词；指向一个时它变成地区色，其它词退到暗处（和 TechSentence 同一种做法） */
+.ww__sentence {
+  margin-top: 40px; font-family: 'Google Sans', var(--f-sans); font-size: clamp(22px, 2vw, 30px); line-height: 1.45; letter-spacing: -0.02em;
+  color: #9aa0a6; text-wrap: pretty;
+}
+.ww__word {
+  color: #e8eaed; cursor: pointer; text-decoration: underline; text-decoration-thickness: 1.5px; text-underline-offset: 0.2em;
+  text-decoration-color: rgba(255, 255, 255, .2); transition: color .35s var(--spring), text-decoration-color .35s;
+}
+.ww__word b { font-weight: 500; font-variant-numeric: tabular-nums; }
+.ww__side.has-on .ww__word { color: #5f6368; text-decoration-color: transparent; }
+.ww__side.has-on .ww__word.is-on { color: var(--c); text-decoration-color: currentColor; }
+.ww__word:focus-visible { outline: 2px solid currentColor; outline-offset: 4px; border-radius: 4px; }
+
+.ww__src { margin-top: 32px; color: var(--text-3); }
+.ww__src a { color: var(--text-2); text-decoration: underline; text-underline-offset: 3px; text-decoration-color: rgba(255, 255, 255, .2); }
+
+@media (max-width: 960px) {
+  .ww { grid-template-columns: 1fr; gap: 48px; }
+  .ww__stage { max-width: 520px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .globe, .ww__grid i, .ww__word { transition: none; }
+  .ww__status button, .ww.is-in .ww__grid i { animation: none; }
+}

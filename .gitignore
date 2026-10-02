@@ -1,0 +1,11 @@
+node_modules
+dist
+.DS_Store
+# 本地快照（每次改版前的备份），不上传
+_backup
+# 只用来挑选设计的预览页，不属于正式网站
+demo.html
+team-demo.html
+globe-demo.html
+src/demo
+.claude

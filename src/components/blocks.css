@@ -1,0 +1,149 @@
+/* Timeline / TechSentence / JoinRows 共用样式——只作用于 .tl / .ts / .jr，不影响网站其它部分
+   动效统一用 cubic-bezier(0.32, 0.72, 0, 1)（有"质量感"的减速），只动 transform / opacity / clip-path */
+.tl, .ts, .jr {
+  --hair: rgba(255, 255, 255, 0.08);
+  --title: #e8eaed;
+  --body: #9aa0a6;
+  --meta: #5f6368;
+  --spring: cubic-bezier(0.32, 0.72, 0, 1);
+  --draw: cubic-bezier(0.65, 0, 0.35, 1);
+}
+.t-blue { --c: #4285f4; --c-text: #8ab4f8; }
+.t-red { --c: #ea4335; --c-text: #f28b82; }
+.t-yellow { --c: #fbbc04; --c-text: #fdd663; }
+.t-green { --c: #34a853; --c-text: #81c995; }
+
+/* =================== 2. Timeline：Road to Hackathon Day =================== */
+.tl { margin-top: 180px; }
+.tl__head { display: flex; justify-content: space-between; align-items: flex-end; gap: 32px; }
+.tl__title { font-family: 'Google Sans', 'Geist', sans-serif; font-size: clamp(44px, 4vw, 72px); font-weight: 400; letter-spacing: -0.045em; line-height: 1.02; color: #f1f3f4; }
+.tl__count { display: flex; align-items: flex-end; gap: 14px; }
+.tl__days { font: 500 clamp(56px, 5vw, 88px)/0.85 'Geist Mono', ui-monospace, monospace; letter-spacing: -0.05em; color: #8ab4f8; font-variant-numeric: tabular-nums; }
+.tl__unit { font: 500 12px/1.5 'Geist Mono', ui-monospace, monospace; color: var(--meta); }
+
+/* 阶段：三段，每段上方一条细括号线 */
+.tl__phases { display: grid; grid-template-columns: repeat(var(--n), 1fr); margin-top: 72px; list-style: none; }
+.tl__phases li {
+  position: relative; padding: 0 8px 14px; font: 500 12px/1 'Geist Mono', ui-monospace, monospace; color: var(--body);
+  border-bottom: 1px solid var(--hair); margin: 0 10px;
+}
+.tl__phases li::before, .tl__phases li::after { content: ''; position: absolute; bottom: -1px; width: 1px; height: 7px; background: rgba(255, 255, 255, 0.16); }
+.tl__phases li::before { left: 0; } .tl__phases li::after { right: 0; }
+
+/* 轴线：从第一个节点中心到最后一个节点中心 */
+.tl__track { position: relative; height: 2px; margin: 40px calc(100% / var(--n) / 2) 0; }
+.tl__rail { position: absolute; inset: 0; background: var(--hair); }
+.tl__fill { position: absolute; inset: 0; background: #4285f4; transform-origin: 0 50%; transform: scaleX(0); transition: transform 1.4s var(--draw) 0.2s; }
+.tl.is-in .tl__fill { transform: scaleX(var(--prog)); }
+.tl__now {
+  position: absolute; top: -30px; translate: -50% 0; padding: 3px 7px; border-radius: 5px;
+  font: 500 11px/1 'Geist Mono', ui-monospace, monospace; color: #8ab4f8; background: rgba(66, 133, 244, 0.12);
+  opacity: 0; transition: opacity 0.5s var(--spring) 1.4s;
+}
+.tl__now::after { content: ''; position: absolute; left: 50%; top: 100%; width: 1px; height: 11px; background: rgba(138, 180, 248, 0.5); }
+.tl.is-in .tl__now { opacity: 1; }
+
+/* 节点 */
+.tl__nodes { display: grid; grid-template-columns: repeat(var(--n), 1fr); margin-top: -6px; list-style: none; }
+.tl__node {
+  position: relative; display: flex; flex-direction: column; align-items: center; gap: 10px; padding: 0 6px; text-align: center;
+  opacity: 0; transform: translateY(10px); transition: opacity 0.6s var(--spring), transform 0.7s var(--spring);
+  transition-delay: calc(0.3s + var(--i) * 90ms);
+}
+.tl.is-in .tl__node { opacity: 1; transform: none; }
+.tl__dot { width: 10px; height: 10px; border-radius: 2px; background: var(--page, #0b0c0f); border: 1.5px solid rgba(255, 255, 255, 0.35); transition: transform 0.4s var(--spring), border-color 0.3s; }
+.tl__node.is-done .tl__dot { background: #fff; border-color: #fff; }
+.tl__node.is-next .tl__dot { border-color: #8ab4f8; background: rgba(66, 133, 244, 0.25); }
+.tl__node.is-goal .tl__dot { width: 14px; height: 14px; margin-top: -2px; border-color: #fff; }
+.tl__label { margin-top: 8px; font-size: 15px; font-weight: 500; line-height: 1.3; color: var(--body); transition: color 0.3s; text-wrap: balance; }
+.tl__node.is-done .tl__label, .tl__node.is-next .tl__label, .tl__node.is-goal .tl__label { color: var(--title); }
+.tl__meta { font: 500 11.5px/1 'Geist Mono', ui-monospace, monospace; color: var(--meta); }
+.tl__node.is-next .tl__meta { color: #8ab4f8; }
+.tl__node.is-goal .tl__meta { color: var(--title); }
+.tl__flag { margin-top: 2px; }
+.tl__node:hover .tl__dot { transform: scale(1.35); border-color: #fff; }
+.tl__node:hover .tl__label { color: #fff; }
+
+@media (max-width: 1100px) {
+  .tl__phases { display: none; }
+  .tl__label { font-size: 13px; }
+}
+@media (max-width: 860px) {
+  .tl__head { flex-direction: column; align-items: flex-start; }
+  .tl__nodes { grid-template-columns: 1fr; gap: 14px; margin-top: 24px; }
+  .tl__track { display: none; }
+  .tl__node { flex-direction: row; text-align: left; }
+  .tl__label { margin-top: 0; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .tl__node, .tl__fill, .tl__now {
+    transition: none; opacity: 1; transform: none;
+  }
+  .tl__fill { transform: scaleX(var(--prog)); }
+}
+
+/* =================== TechSentence：一句大字，产品名就是链接 =================== */
+.ts { margin: 96px auto 0; text-align: center; }
+.ts .tone-gemini { --p: #c58af9; } .ts .tone-firebase { --p: #ffca28; } .ts .tone-android { --p: #3ddc84; } .ts .tone-cloud { --p: #8ab4f8; }
+.ts__sentence {
+  max-width: 1100px; margin: 0 auto; font-family: 'Google Sans', 'Geist', sans-serif; font-size: clamp(34px, 3.6vw, 60px); font-weight: 400;
+  line-height: 1.2; letter-spacing: -0.03em; color: #9aa0a6; text-wrap: balance;
+}
+.ts__word {
+  color: #e8eaed; text-decoration: underline; text-decoration-thickness: 1.5px; text-underline-offset: 0.16em;
+  text-decoration-color: rgba(255, 255, 255, 0.22); transition: color 0.35s cubic-bezier(0.16, 1, 0.3, 1), text-decoration-color 0.35s;
+}
+/* 唯一的动效重点：指向一个产品时，它变成产品色，其它三个退到暗处 */
+.ts.has-on .ts__word { color: #5f6368; text-decoration-color: transparent; }
+.ts.has-on .ts__word.is-on { color: var(--p); text-decoration-color: currentColor; }
+.ts__word:focus-visible { outline: 2px solid currentColor; outline-offset: 6px; border-radius: 6px; }
+.ts__caption { min-height: 1.6em; margin-top: 30px; font-size: 16.5px; line-height: 1.6; color: #9aa0a6; }
+.ts__swap { display: inline-block; animation: tsSwap 0.45s cubic-bezier(0.16, 1, 0.3, 1); }
+.ts__idle { color: #5f6368; }
+.ts__host { margin-left: 10px; white-space: nowrap; color: var(--p); }
+.ts__icon { vertical-align: -1px; }
+@keyframes tsSwap { from { opacity: 0; transform: translateY(6px); filter: blur(3px); } to { opacity: 1; transform: none; filter: none; } }
+
+/* =================== JoinRows：三行大字 + 悬停扫出二维码 =================== */
+.jr { width: 100%; max-width: 1120px; margin: 72px auto 40px; list-style: none; text-align: left; }
+.jr .tone-blue { --p: #8ab4f8; --c: #4285f4; } .jr .tone-red { --p: #f28b82; --c: #ea4335; } .jr .tone-yellow { --p: #fdd663; --c: #fbbc04; }
+.jr__row {
+  display: grid; grid-template-columns: 48px minmax(0, 1fr) auto; align-items: center; gap: 28px; padding: 26px 0;
+  border-top: 1px solid rgba(255, 255, 255, 0.08); transition: opacity 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.jr__row:last-child { border-bottom: 1px solid rgba(255, 255, 255, 0.08); }
+.jr:has(.jr__row:hover) .jr__row:not(:hover) { opacity: 0.4; }
+.jr__step { align-self: start; padding-top: 0.55em; font-family: 'Google Sans', sans-serif; font-size: 18px; font-weight: 500; color: #5f6368; font-variant-numeric: tabular-nums; }
+.jr__main { display: block; min-width: 0; color: inherit; text-decoration: none; }
+.jr__title {
+  display: block; font-family: 'Google Sans', 'Geist', sans-serif; font-size: clamp(30px, 3.1vw, 50px); font-weight: 400; line-height: 1.1;
+  letter-spacing: -0.03em; color: #e8eaed; text-wrap: balance; transition: transform 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.jr__title em { font-style: normal; color: var(--p); }
+.jr__sub { display: block; max-width: 60ch; margin-top: 10px; font-size: 16px; line-height: 1.55; color: #9aa0a6; }
+.jr__row:hover .jr__title { transform: translateX(8px); }
+a.jr__main:focus-visible { outline: 2px solid var(--p); outline-offset: 8px; border-radius: 8px; }
+
+/* 二维码：一直显示，小而紧（白边只留扫码需要的一点），悬停那一行时一条品牌色扫描线经过一次 */
+.jr__qr {
+  position: relative; justify-self: end; width: 88px; height: 88px; padding: 4px; border-radius: 4px; background: #fff; overflow: hidden;
+  transition: transform 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.jr__qr img { display: block; width: 100%; height: 100%; }
+.jr__qr i { position: absolute; top: 0; bottom: 0; left: 0; width: 2px; background: var(--c); opacity: 0; }
+.jr__row:hover .jr__qr { transform: scale(1.06); }
+.jr__row:hover .jr__qr i { animation: jrScan 0.75s 0.15s cubic-bezier(0.65, 0, 0.35, 1) both; }
+@keyframes jrScan { from { transform: translateX(0); opacity: 1; } to { transform: translateX(86px); opacity: 0; } }
+.jr__go { justify-self: end; color: var(--p); transition: transform 0.5s cubic-bezier(0.16, 1, 0.3, 1); }
+.jr__row:hover .jr__go { transform: translate(4px, -4px); }
+
+@media (max-width: 860px) {
+  .jr__row { grid-template-columns: 32px minmax(0, 1fr); }
+  .jr__qr { grid-column: 2; justify-self: start; }
+  .jr__go { display: none; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .jr__qr { transition: none; }
+  .jr__row:hover .jr__qr i { animation: none; }
+  .ts__swap { animation: none; }
+}

@@ -1,0 +1,28 @@
+{
+ "total": 1891,
+ "countries": 137,
+ "placed": 1687,
+ "regions": [
+  {
+   "name": "Northern America",
+   "count": 242
+  },
+  {
+   "name": "Latin America",
+   "count": 132
+  },
+  {
+   "name": "Europe, Middle East & North Africa",
+   "count": 488
+  },
+  {
+   "name": "Africa (Sub-Saharan)",
+   "count": 225
+  },
+  {
+   "name": "Asia, Oceania",
+   "count": 804
+  }
+ ],
+ "updated": "2026-10-01"
+}
