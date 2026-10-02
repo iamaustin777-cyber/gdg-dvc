@@ -207,7 +207,7 @@ export function teamSize() {
 export const join = {
   steps: [
     { title: 'Follow our Instagram', text: '@gdgoc_dvc — announcements, events and hackathon news.', qr: 'media/gdg-instagram-qr.png', href: 'https://instagram.com/gdgoc_dvc' },
-    { title: 'Join us on DVC Sync', text: 'Become an official member through DVC’s club platform.', qr: 'media/gdg-dvcsync-qr.png' },
+    { title: 'Join us on DVC Sync', text: 'Become an official member through DVC’s club platform.', qr: 'media/gdg-dvcsync-qr.png', href: 'https://dvc.campuslabs.com/engage/organization/dvcdevelopers' },
     { title: 'Come to a meeting', text: 'Every Wednesday, 2:00–3:00 PM in LC 200 / 205. No experience needed.' },
   ],
   officer: { label: 'Apply to be an officer', href: 'https://tally.so/r/jaAAEx' },

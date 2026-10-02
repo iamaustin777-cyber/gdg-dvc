@@ -122,6 +122,12 @@
 .jr__title em { font-style: normal; color: var(--p); }
 .jr__sub { display: block; max-width: 60ch; margin-top: 10px; font-size: 16px; line-height: 1.55; color: #9aa0a6; }
 .jr__row:hover .jr__title { transform: translateX(8px); }
+/* 每行标题下面显示真实网址，一看就知道可以点 */
+.jr__link { display: inline-flex; align-items: center; gap: 6px; margin-top: 12px; font: 500 14px/1 'Geist Mono', ui-monospace, monospace; color: var(--p); text-decoration: underline; text-underline-offset: 4px; text-decoration-color: color-mix(in srgb, var(--p) 35%, transparent); transition: text-decoration-color .25s; }
+.jr__link .jr__icon { width: 13px; height: 13px; }
+a.jr__main:hover .jr__link { text-decoration-color: currentColor; }
+a.jr__qr { cursor: pointer; }
+a.jr__qr:focus-visible { outline: 2px solid var(--p); outline-offset: 4px; }
 a.jr__main:focus-visible { outline: 2px solid var(--p); outline-offset: 8px; border-radius: 8px; }
 
 /* 二维码：一直显示，小而紧（白边只留扫码需要的一点），悬停那一行时一条品牌色扫描线经过一次 */
