@@ -12,3 +12,7 @@ Pushing to `main` deploys to GitHub Pages (`.github/workflows/deploy.yml`).
 
 - Chapter globe data: `python3 scripts/build-globe-data.py <chapters.json> <land-110m.json>` (sources listed in the script).
 - Google campus photos are from Wikimedia Commons under CC BY-SA 4.0; attribution is shown with each photo.
+
+---
+
+Designed and built by [Austin Cao](https://github.com/iamaustin777-cyber), Lead Software Architect, GDG on Campus DVC (2026–27).

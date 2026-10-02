@@ -28,6 +28,10 @@ export default function Join() {
       <footer className="footer">
         <span className="footer__brand"><Mark size={11} /> {site.club} · {site.campus}</span>
         <span>Independent student chapter. Google and the GDG logo are trademarks of Google LLC.</span>
+        {/* 网站作者署名 */}
+        <span className="footer__credit">
+          Designed &amp; built by <a href="https://github.com/iamaustin777-cyber" target="_blank" rel="noreferrer">Austin Cao</a>
+        </span>
         <a href="#top">Back to top ↑</a>
       </footer>
     </>

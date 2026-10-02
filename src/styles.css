@@ -461,6 +461,7 @@ ul, ol { list-style: none; }
 }
 .footer__brand { display: flex; align-items: center; gap: 10px; color: var(--text-2); }
 .footer a:hover { color: var(--text); }
+.footer__credit a { color: var(--text-2); text-decoration: underline; text-underline-offset: 3px; text-decoration-color: rgba(255,255,255,.2); transition: color .2s; }
 
 /* =====================================================================
    首屏 → 主体
