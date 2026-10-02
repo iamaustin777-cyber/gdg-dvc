@@ -4,14 +4,14 @@ import { benefits, photos } from '../data.js'
 
 const pad = (n) => String(n).padStart(2, '0')
 
-// 为什么加入：左边谷歌路牌照片钉住不动，右边六条理由滚过去（杂志式，没有框）
+// 为什么加入：左边 Gemini 海报（代码画的）钉住不动，右边六条理由滚过去（杂志式，没有框）
 export default function Benefits() {
   return (
     <section className="panel" id="why">
       <Heading tag="Why Join" title="What you get as a member" sub="Any major, any experience level. If you’re curious about tech, there’s a place for you here." />
       <div className="why">
         <div className="why__aside">
-          <Photo photo={photos.sign} className="why__photo" scroll />
+          <Photo photo={photos.geminiPoster} className="why__photo" scroll />
         </div>
         <ol className="why__list">
           {benefits.map((b, i) => (

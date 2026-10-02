@@ -292,6 +292,70 @@ ul, ol { list-style: none; }
 .ed-row.is-flip .ed-row__photo { order: 2; }
 .ed-row__photo { height: clamp(420px, 40vw, 680px); --wr: 28px; border-radius: 28px; }
 .ed-row__photo img { height: 120%; transform: translateY(calc(-8.3% - (var(--t, .5) - .5) * 10%)) scale(calc(1.2 - var(--p, 1) * .2)); }
+/* Gemini 海报（GeminiPoster.jsx）：黑底 + 光线 + 渐变字 */
+.poster--gemini { position: relative; display: block; background: radial-gradient(120% 70% at 50% 60%, #0d1220 0%, #050608 60%, #020203 100%); }
+.gposter { position: absolute; inset: 0; }
+.gposter__lines { position: absolute; inset: 0; width: 100%; height: 100%; }
+.gposter__flow { stroke-dasharray: 90 910; stroke-dashoffset: 1000; stroke-linecap: round; animation: gFlow 4.2s linear infinite; animation-delay: calc(var(--k) * -0.8s); }
+@keyframes gFlow { to { stroke-dashoffset: 0; } }
+.gposter__word {
+  position: absolute; left: 50%; top: 52%; transform: translate(-50%, -100%); margin-top: -6%;
+  display: inline-flex; align-items: flex-start; font-family: 'Google Sans', var(--f-sans); font-size: clamp(52px, 5.4vw, 92px); font-weight: 400; letter-spacing: -0.03em; line-height: 1;
+  background: linear-gradient(90deg, #6d9cf4 0%, #a9c3f5 38%, #e8e6ee 70%, #f0c9c4 100%); -webkit-background-clip: text; background-clip: text; color: transparent;
+}
+.gposter__spark { width: .34em; height: .34em; margin: -.38em 0 0 .04em; color: #f4dcc0; }
+/* Gemini 海报的互动：可点；点一下光加速 + 星芒转一圈；悬停时字的渐变慢慢流动 */
+.gposter { cursor: pointer; }
+.gposter__word { background-size: 200% 100%; transition: background-position 1.2s cubic-bezier(.32,.72,0,1); }
+.gposter:hover .gposter__word { background-position: 60% 0; }
+.gposter__spark { transition: transform .5s cubic-bezier(.32,.72,0,1); }
+.gposter:hover .gposter__spark { transform: scale(1.15) rotate(15deg); }
+.gposter.is-burst .gposter__spark { animation: gSpin .9s cubic-bezier(.32,.72,0,1); }
+.gposter.is-burst .gposter__flow { animation-duration: .9s; stroke-dasharray: 260 740; }
+@keyframes gSpin { from { transform: scale(1.4) rotate(0); } to { transform: scale(1.15) rotate(195deg); } }
+.gposter__hint { position: absolute; left: 50%; bottom: 7%; transform: translateX(-50%); font-family: var(--f-mono); font-size: 11.5px; color: rgba(255,255,255,.3); transition: opacity .3s; }
+.gposter:hover .gposter__hint { opacity: 0; }
+@media (prefers-reduced-motion: reduce) { .gposter__flow { animation: none; opacity: 0; } .gposter.is-burst .gposter__spark { animation: none; } }
+
+/* Hackathon 代码编辑器（HackCode.jsx）：标签栏 + 代码 + 终端 + 状态栏 */
+.poster--code { display: block; background: #0c0e12; }
+.hc { position: absolute; inset: 0; display: flex; flex-direction: column; font-family: var(--f-mono); font-size: clamp(11px, .92vw, 13.5px); line-height: 1.7; color: #c9ccd1; }
+.hc__bar { display: flex; align-items: center; justify-content: space-between; height: 44px; padding: 0 14px 0 0; border-bottom: 1px solid rgba(255,255,255,.07); background: #090a0d; }
+.hc__tab { display: inline-flex; align-items: center; gap: 9px; height: 100%; padding: 0 18px; color: #e8eaed; background: #0c0e12; border-right: 1px solid rgba(255,255,255,.07); box-shadow: inset 0 2px 0 #8ab4f8; }
+.hc__run { display: inline-flex; align-items: center; gap: 7px; padding: 5px 12px; font: inherit; font-size: 12px; color: #81c995; background: rgba(129,201,149,.08); border: 1px solid rgba(129,201,149,.25); border-radius: 6px; cursor: pointer; transition: background .2s, transform .15s; }
+.hc__run:hover { background: rgba(129,201,149,.16); }
+.hc__run:active { transform: scale(.96); }
+.hc__code { flex: 1; min-height: 0; margin: 0; padding: 14px 0; overflow: hidden; font: inherit; }
+.hc__line { display: flex; min-height: 1.7em; padding-right: 16px; white-space: pre; }
+.hc__line.is-cur { background: rgba(138,180,248,.06); }
+.hc__ln { flex: none; width: 3.4em; padding-right: 1.2em; text-align: right; color: #3c4043; user-select: none; }
+.hc__line.is-cur .hc__ln { color: #9aa0a6; }
+.hc__line code { font: inherit; overflow: hidden; text-overflow: clip; }
+.hc-com { color: #5f6368; font-style: italic; }
+.hc-kw { color: #c58af9; }
+.hc-fn { color: #8ab4f8; }
+.hc-str { color: #81c995; }
+.hc-num { color: #fdd663; }
+.hc-prop { color: #f28b82; }
+.hc-v { color: #e8eaed; }
+.hc-p { color: #9aa0a6; }
+.hc__caret { display: inline-block; width: .6em; height: 1.15em; margin-left: 1px; vertical-align: -.2em; background: #8ab4f8; animation: hcBlink 1s steps(1) infinite; }
+@keyframes hcBlink { 50% { opacity: 0; } }
+.hc__term { flex: none; min-height: 9.6em; padding: 12px 20px 14px; border-top: 1px solid rgba(255,255,255,.07); background: #08090c; }
+.hc__term p { margin: 0; animation: hcIn .25s ease-out; }
+@keyframes hcIn { from { opacity: 0; transform: translateY(3px); } }
+.hc-t-cmd { color: #e8eaed; }
+.hc-t-dim { color: #9aa0a6; }
+.hc-t-ok { color: #81c995; }
+.hc__status { flex: none; display: flex; gap: 18px; height: 26px; align-items: center; padding: 0 16px; font-size: 11px; color: #9aa0a6; background: #0f1218; border-top: 1px solid rgba(255,255,255,.06); }
+.hc__right { margin-left: auto; }
+@media (prefers-reduced-motion: reduce) { .hc__caret { animation: none; } .hc__term p { animation: none; } }
+/* 用文字做的"海报"（Google AI Studio）：纯黑底，图标 + 名字 + 一句标语，居中 */
+.poster { display: grid; place-items: center; background: #000; }
+.poster__inner { padding: 0 8%; text-align: center; }
+.poster__title { display: inline-flex; align-items: center; gap: .32em; font-family: 'Google Sans', var(--f-sans); font-size: clamp(30px, 3.6vw, 60px); font-weight: 500; letter-spacing: -0.025em; line-height: 1; color: #fff; white-space: nowrap; }
+.poster__icon { width: .92em; height: .92em; flex: none; }
+.poster__sub { margin-top: 1.1em; font-family: 'Google Sans', var(--f-sans); font-size: clamp(14px, 1.25vw, 19px); color: #bdc1c6; text-wrap: balance; }
 .ed-row__copy h3 { margin-top: 26px; font-family: 'Google Sans', var(--f-sans); font-size: clamp(36px, 3vw, 56px); font-weight: 500; letter-spacing: -0.035em; line-height: 1.04; }
 .ed-row__copy p { margin-top: 16px; max-width: 36ch; color: var(--text-2); font-size: 18px; line-height: 1.6; }
 

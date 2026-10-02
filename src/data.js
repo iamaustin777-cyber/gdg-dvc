@@ -55,7 +55,7 @@ export const about = {
     { icon: 'zap', color: 'red', photo: 'bikeClose', title: 'Hackathons', text: 'Build, create and turn ideas into real projects.' },
     { icon: 'bulb', color: 'yellow', photo: 'logoWall', title: 'Projects', text: 'Work on real-world projects with a team, and showcase what you make.' },
     { icon: 'link', color: 'green', photo: 'patio', title: 'Collabs', text: 'Partner with other clubs, initiatives and the wider community.' },
-    { icon: 'users', color: 'blue', photo: 'lawn', title: 'Community', text: 'Meet fellow students, industry guests and mentors.' },
+    { icon: 'users', color: 'blue', photo: 'googleShirts', title: 'Community', text: 'Meet fellow students, industry guests and mentors.' },
     { icon: 'heart', color: 'red', photo: 'bikes', title: 'Beginner-friendly', text: 'Any major, any experience level — just bring your curiosity.' },
   ],
   facts: [
@@ -313,12 +313,121 @@ Object.assign(photos, {
   },
 })
 
+// 2026 年换上的新照片（同样来自 Wikimedia Commons，但许可协议各不相同，所以每张单独写 license）
+const LICENSES = {
+  'CC BY-SA 3.0': { label: 'CC BY-SA 3.0', href: 'https://creativecommons.org/licenses/by-sa/3.0/' },
+  'CC BY 4.0': { label: 'CC BY 4.0', href: 'https://creativecommons.org/licenses/by/4.0/' },
+}
+Object.assign(photos, {
+  devfestCatania: {
+    src: commons('1/17/GiovanniPen_during_a_Wikipedia_presentation_at_DevFest_Catania_2025.jpg'),
+    alt: 'A talk at DevFest Catania 2025, with the audience facing a slide titled “Google, Wikipedia, us and our cities”',
+    credit: 'Auregann',
+    href: 'https://commons.wikimedia.org/wiki/File:GiovanniPen_during_a_Wikipedia_presentation_at_DevFest_Catania_2025.jpg',
+  },
+  io2019: {
+    src: commons('e/e0/Google_I-O_2019.jpg'),
+    alt: 'The Google I/O 2019 keynote stage at Shoreline Amphitheatre, with a large crowd in front of the screens',
+    credit: 'Александр Щербаков',
+    href: 'https://commons.wikimedia.org/wiki/File:Google_I-O_2019.jpg',
+    license: LICENSES['CC BY-SA 3.0'],
+  },
+  liquidGalaxy: {
+    src: commons('c/c5/Google_Earth_Liquid_Galaxy.jpg'),
+    alt: 'A Google Earth Liquid Galaxy: a curved wall of screens showing a 3D city, flanked by “Explore your world” panels',
+    credit: 'Runner1928',
+    href: 'https://commons.wikimedia.org/wiki/File:Google_Earth_Liquid_Galaxy.jpg',
+    license: LICENSES['CC BY-SA 3.0'],
+  },
+  waymo: {
+    src: commons('7/75/Waymo_Jaguar_I-Pace_in_San_Francisco_2023_dllu.jpg'),
+    alt: 'A white Waymo self-driving Jaguar I-Pace with roof sensors on a San Francisco street',
+    credit: 'Dllu',
+    href: 'https://commons.wikimedia.org/wiki/File:Waymo_Jaguar_I-Pace_in_San_Francisco_2023_dllu.jpg',
+    license: LICENSES['CC BY 4.0'],
+  },
+})
+
+// Unsplash 上的照片（Unsplash License：网站可以免费使用，不需要付费；仍然标注作者以示尊重）
+const unsplash = (id, w = 1600) => `https://images.unsplash.com/photo-${id}?w=${w}&q=80&auto=format&fit=crop`
+const UNSPLASH_LICENSE = { label: 'Unsplash', href: 'https://unsplash.com/license' } // 署名写短一点，窄卡片里不会折行
+Object.assign(photos, {
+  hackathonNight: {
+    src: unsplash('1504384764586-bb4cdc1707b0'),
+    alt: 'Developers coding on laptops late at night at a hackathon, lit in purple',
+    credit: 'Alex Kotliarskyi',
+    href: 'https://unsplash.com/photos/ourQHRTE2IM',
+    license: UNSPLASH_LICENSE,
+  },
+  geminiAd: {
+    src: unsplash('1777785113207-c0fdd05ae937', 1200),
+    alt: 'A Google Gemini ad on a street display reading “A new kind of help from Google”',
+    credit: 'Igor Shalyminov',
+    href: 'https://unsplash.com/photos/coyQjf-qjy0',
+    license: UNSPLASH_LICENSE,
+  },
+  pixelCloseup: {
+    src: unsplash('1729302784412-c36bbab2a6ef', 1400),
+    alt: 'Close-up of a Google Pixel phone’s camera bar in raking light',
+    credit: 'Samuel Angor',
+    href: 'https://unsplash.com/photos/IHkYPDanoUg',
+    license: UNSPLASH_LICENSE,
+  },
+  hackathonRoom: {
+    src: unsplash('1504384308090-c894fdcc538d', 1200),
+    alt: 'A room full of developers working on laptops at a hackathon, lit in purple',
+    credit: 'Alex Kotliarskyi',
+    href: 'https://unsplash.com/photos/QBpZGqEMsKg',
+    license: UNSPLASH_LICENSE,
+  },
+  googleNeon: {
+    src: unsplash('1573804633927-bfcbcd909acd', 1200),
+    alt: 'A glowing neon Google logo on a dark wall',
+    credit: 'Mitchell Luo',
+    href: 'https://unsplash.com/photos/jz4ca36oJ_M',
+    license: UNSPLASH_LICENSE,
+  },
+  googleNight: {
+    src: unsplash('1638136264464-2711f0078d1e', 1200),
+    alt: 'The Google logo lit up on a building at night',
+    credit: 'Sascha Bosshard',
+    href: 'https://unsplash.com/photos/et3Fex4JiBw',
+    license: UNSPLASH_LICENSE,
+  },
+  hackCode: {
+    graphic: 'code',
+    alt: 'A code editor typing out the hackathon details, then running them in a terminal',
+  },
+  geminiPoster: {
+    graphic: 'gemini',
+    alt: 'The Gemini wordmark with a sparkle above, over five light strands that converge, braid together and spread apart',
+  },
+  aiStudio: {
+    graphic: 'ai-studio',
+    alt: 'Google AI Studio — the fastest path from prompt to production with Gemini',
+  },
+  googleShirts: {
+    src: unsplash('1773883925979-73e8eb2f36ac', 1600),
+    alt: 'Six people in white T-shirts lined up so the letters on their shirts spell “Google”, seen from above with long shadows',
+    credit: 'dilara irem sancar',
+    href: 'https://unsplash.com/photos/1gxrjzZ0v-8',
+    license: UNSPLASH_LICENSE,
+  },
+  googleEntrance: {
+    src: unsplash('1690983730723-37220d10db46', 1400),
+    alt: 'People walking past the glass entrance of a Google office with the Google logo above the doors',
+    credit: 'Karollyne Videira Hubert',
+    href: 'https://unsplash.com/photos/BaQsbDu8Oso',
+    license: UNSPLASH_LICENSE,
+  },
+})
+
 // Events 里的照片墙：全球 GDG 社区 + 谷歌园区
 export const gallery = [
-  { photo: 'gdgLome', caption: 'GDG Lomé, Togo' },
-  { photo: 'prayagraj', caption: 'DevFest · GDG Prayagraj, India' },
-  { photo: 'sculptures', caption: 'Android sculptures · Googleplex' },
-  { photo: 'doors', caption: 'Googleplex, Mountain View' },
+  { photo: 'hackathonRoom', caption: 'Hack night' },
+  { photo: 'googleNeon', caption: 'Google, in neon' },
+  { photo: 'googleNight', caption: 'Google, after dark' },
+  { photo: 'waymo', caption: 'Waymo self-driving car · San Francisco' },
 ]
 
 export const PHOTO_LICENSE = { label: 'CC BY-SA 4.0', href: 'https://creativecommons.org/licenses/by-sa/4.0/' }
