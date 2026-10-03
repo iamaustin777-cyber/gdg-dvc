@@ -186,6 +186,10 @@ export default function Team() {
                 </li>
               )
             })}
+            {/* 人数不是 4 的倍数时，用空的像素格把最后一行补齐 */}
+            {Array.from({ length: (4 - (members.length % 4)) % 4 }, (_, k) => (
+              <li key={`empty-${k}`} aria-hidden><span className="wall__empty" /></li>
+            ))}
           </ul>
           <p className="wall__status code" key={idx}>
             <span><i className="c-green">$</i> open officers/{slug(cur.name)}.jpg</span>

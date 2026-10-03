@@ -160,6 +160,7 @@ export const team = [
     members: [
       { name: 'Preston Susanto', photo: 'media/team/preston.jpg', role: 'President / GDG Lead', duty: 'Sets overall direction and owns the relationship with Google and DVC.', lead: true },
       { name: 'Aaron Timothy', photo: 'media/team/aaron-timothy.jpg', role: 'Vice President', duty: 'Backs up the President and steps in on cross-team issues.' },
+      { name: 'Alyssa Lim', photo: 'media/team/alyssa.jpg', role: 'Chief Operating Officer', duty: 'Runs day-to-day operations and the Task Tracker.' },
       { name: 'Austin Cao', photo: 'media/team/austin.jpg', role: 'Lead Software Architect', duty: 'Builds the club’s software projects and web presence — including this site.' },
       { name: 'Ella Moon', photo: 'media/team/ella.jpg', role: 'Chief Finance Officer', duty: 'Owns the budget, reimbursements and DVCSync paperwork.' },
       { name: 'Micah Iswaranata', photo: 'media/team/micah.jpg', role: 'Secretary', duty: 'Meeting notes, attendance and leadership records.' },
