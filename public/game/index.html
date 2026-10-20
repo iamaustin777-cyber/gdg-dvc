@@ -178,8 +178,8 @@
   body.mobile .screen { overflow-y: auto; -webkit-overflow-scrolling: touch; }
   body.mobile .stripe { height: 5px; }
 
-  body.mobile #attract { justify-content: flex-start; gap: 18px; padding: 8px 16px max(20px, env(safe-area-inset-bottom)); }
-  body.mobile .title { font-size: 14.5vw; margin-top: 2vh; white-space: nowrap; }
+  body.mobile #attract { justify-content: flex-start; gap: 16px; padding: 8px 16px max(20px, env(safe-area-inset-bottom)); }
+  body.mobile .title { font-size: 14.5vw; margin-top: 1vh; white-space: nowrap; }
   body.mobile .subtitle { font-size: 18px; margin-top: 8px; }
   body.mobile .subtitle .serif { font-size: 23px; }
   body.mobile .board-wrap { width: 100%; max-width: 480px; }
@@ -187,7 +187,7 @@
   body.mobile .board::before { height: 5px; }
   body.mobile .board h2 { font-size: 17px; margin-bottom: 8px; }
   body.mobile .board h2 small { font-size: 10px; }
-  body.mobile .board li { font-size: 16px; line-height: 34px; gap: 12px; }
+  body.mobile .board li { font-size: 16px; line-height: 31px; gap: 12px; }
   body.mobile .board li .rk { width: 20px; font-size: 12px; }
   body.mobile .board li .vl { font-size: 14px; }
   body.mobile .board .msg { font-size: 15px; padding-top: 60px; }
@@ -195,6 +195,13 @@
   body.mobile .board-tabs i { width: 12px; height: 12px; border-radius: 2px; }
   body.mobile .board-tabs span { display: none; }
   body.mobile .m-start.m-only { display: flex !important; }
+  /* on phones the Play button sits right under the title, above the leaderboard */
+  body.mobile #attract > :first-child { order: 0; margin-top: auto; }
+  body.mobile #attract > .promo-line { margin-bottom: auto; }
+  body.mobile .m-start { order: 1; }
+  body.mobile .board-wrap { order: 2; }
+  body.mobile .promo-line { order: 3; }
+  body.mobile .board, body.mobile .res-main, body.mobile .promo { background: #fff; }
   .m-start { display: flex; flex-direction: column; align-items: center; gap: 10px; }
   .m-start .mbtn { font-size: 20px; padding: 18px 48px; }
   .m-start small { font-size: 13px; color: var(--text-2); text-align: center; }
@@ -240,8 +247,23 @@
   body.mobile .d5, body.mobile .d6, body.mobile .d7, body.mobile .d8 { display: none; }
   body.mobile .d1 { width: 40vw; height: 40vw; left: -26vw; top: 46%; }
   body.mobile .d2 { width: 26vw; height: 26vw; left: -6vw; bottom: -8vw; border-radius: 4vw; }
-  body.mobile .d3 { width: 18vw; height: 18vw; right: -8vw; top: 25vh; }
+  body.mobile .d3 { width: 15vw; height: 15vw; right: -8vw; top: 7vh; }
   body.mobile .d4 { width: 44vw; height: 44vw; border-width: 6vw; right: -24vw; bottom: -12vw; }
+  /* phone held sideways: one row of buttons, shapes sized to the short side */
+  @media (orientation: landscape) and (max-height: 520px) {
+    body.mobile .pad { grid-template-columns: repeat(4, 1fr); padding: 6px 14px max(10px, env(safe-area-inset-bottom)); }
+    body.mobile .pad button { height: max(56px, 16vh); font-size: 16px; }
+    body.mobile .side .big { font-size: 12vh; }
+    body.mobile .side .who { font-size: 10px; }
+    body.mobile .word { font-size: min(26vh, 16vw); }
+    body.mobile .timer { width: 60vw; margin-top: 2.5vh; }
+    body.mobile .count { font-size: 40vh; }
+    body.mobile .title { font-size: 10vw; }
+    body.mobile .d1 { width: 44vh; height: 44vh; left: -24vh; top: 40%; }
+    body.mobile .d2 { width: 26vh; height: 26vh; left: -6vh; bottom: -8vh; border-radius: 4vh; }
+    body.mobile .d3 { width: 20vh; height: 20vh; right: -6vh; top: 22vh; }
+    body.mobile .d4 { width: 48vh; height: 48vh; border-width: 7vh; right: -22vh; bottom: -18vh; }
+  }
 </style>
 </head>
 <body>
@@ -806,8 +828,14 @@
   document.addEventListener('input', () => { lastInput = now(); });
 
   // ---------- touch controls (phones / tablets) ----------
-  const MOBILE = matchMedia('(pointer: coarse)').matches || innerWidth < 760;
-  if (MOBILE) document.body.classList.add('mobile');
+  // touch screens, narrow windows and portrait screens get the phone layout (kept in sync on rotate / resize)
+  let MOBILE = false;
+  function updateLayout() {
+    MOBILE = matchMedia('(pointer: coarse)').matches || innerWidth < 760 || innerHeight > innerWidth;
+    document.body.classList.toggle('mobile', MOBILE);
+  }
+  updateLayout();
+  addEventListener('resize', updateLayout);
   $('pad').innerHTML = COLORS.map((c, i) =>
     `<button type="button" data-c="${i}" style="background:${c.hex}">${c.name}</button>`).join('');
   $('pad').addEventListener('pointerdown', (e) => {
