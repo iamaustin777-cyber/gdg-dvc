@@ -2,7 +2,8 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+<meta name="theme-color" content="#ffffff" />
 <title>Color Rush — GDG on Campus DVC</title>
 <link rel="icon" href="/favicon.svg" />
 <link rel="preconnect" href="https://fonts.googleapis.com" />
@@ -27,7 +28,7 @@
   body { background: var(--bg) radial-gradient(rgba(60,64,67,.13) 1px, transparent 1.2px) 0 0 / 22px 22px; }
   .pixels { position: fixed; inset: 0; pointer-events: none; z-index: 0; }
   .pixels i { position: absolute; width: 7px; height: 7px; border-radius: 1px; }
-  #app { position: relative; z-index: 1; height: 100vh; display: flex; flex-direction: column; }
+  #app { position: relative; z-index: 1; height: 100vh; height: 100dvh; display: flex; flex-direction: column; }
   .mono { font-family: var(--f-mono); text-transform: uppercase; letter-spacing: .08em; }
   .serif { font-family: var(--f-serif); font-style: italic; font-weight: 400; letter-spacing: -.01em; }
   .pix4 { display: inline-grid; grid-template-columns: 1vh 1vh; gap: .35vh; vertical-align: middle; }
@@ -158,6 +159,89 @@
   .board::before { content: ''; position: absolute; left: 0; right: 0; top: 0; height: .7vh;
     background: linear-gradient(90deg, var(--blue) 0 25%, var(--red) 0 50%, var(--yellow) 0 75%, var(--green) 0); }
   .press kbd.k1 { background: var(--blue); } .press kbd.k2 { background: var(--red); }
+  /* ---------- phones & tablets (touch): Solo with tap buttons ---------- */
+  .m-only { display: none !important; }
+  body.mobile .d-only { display: none !important; }
+  body.mobile .m-only { display: revert !important; }
+  .mbtn { font: inherit; font-weight: 600; font-size: 18px; border: 0; border-radius: 999px; padding: 15px 26px; cursor: pointer;
+    background: var(--surface-2); color: var(--text); touch-action: manipulation; -webkit-tap-highlight-color: transparent; }
+  .mbtn.primary { background: var(--blue); color: #fff; }
+  .mbtn:active { transform: scale(.97); }
+  body.mobile #fsBtn { display: none; }
+  body.mobile .topbar { padding: max(12px, env(safe-area-inset-top)) 16px 6px; }
+  body.mobile .brand { font-size: 15px; gap: 8px; }
+  body.mobile .brand { white-space: nowrap; }
+  body.mobile .brand .mono { display: none; }
+  body.mobile .pix4 { grid-template-columns: 6px 6px; gap: 2px; }
+  body.mobile .pix4 b { width: 6px; height: 6px; }
+  body.mobile .tools button { font-size: 11px; height: 32px; padding: 0 12px; white-space: nowrap; }
+  body.mobile .screen { overflow-y: auto; -webkit-overflow-scrolling: touch; }
+  body.mobile .stripe { height: 5px; }
+
+  body.mobile #attract { justify-content: flex-start; gap: 18px; padding: 8px 16px max(20px, env(safe-area-inset-bottom)); }
+  body.mobile .title { font-size: 14.5vw; margin-top: 2vh; white-space: nowrap; }
+  body.mobile .subtitle { font-size: 18px; margin-top: 8px; }
+  body.mobile .subtitle .serif { font-size: 23px; }
+  body.mobile .board-wrap { width: 100%; max-width: 480px; }
+  body.mobile .board { height: auto; min-height: 220px; padding: 18px 18px 12px; border-radius: 18px; }
+  body.mobile .board::before { height: 5px; }
+  body.mobile .board h2 { font-size: 17px; margin-bottom: 8px; }
+  body.mobile .board h2 small { font-size: 10px; }
+  body.mobile .board li { font-size: 16px; line-height: 34px; gap: 12px; }
+  body.mobile .board li .rk { width: 20px; font-size: 12px; }
+  body.mobile .board li .vl { font-size: 14px; }
+  body.mobile .board .msg { font-size: 15px; padding-top: 60px; }
+  body.mobile .board-tabs { gap: 14px; margin-top: 12px; }
+  body.mobile .board-tabs i { width: 12px; height: 12px; border-radius: 2px; }
+  body.mobile .board-tabs span { display: none; }
+  body.mobile .m-start.m-only { display: flex !important; }
+  .m-start { display: flex; flex-direction: column; align-items: center; gap: 10px; }
+  .m-start .mbtn { font-size: 20px; padding: 18px 48px; }
+  .m-start small { font-size: 13px; color: var(--text-2); text-align: center; }
+  body.mobile .promo-line { font-size: 10.5px; line-height: 1.6; border-radius: 14px; padding: 8px 12px; max-width: 480px; }
+
+  body.mobile .side { padding: 6px 8px; }
+  body.mobile .side .who { font-size: 11px; }
+  body.mobile .side .big { font-size: min(12vh, 15vw); }
+  body.mobile .side .note { display: none; }
+  body.mobile .word { font-size: min(22vh, 22vw); height: auto; }
+  body.mobile .timer { width: 80vw; height: 6px; margin-top: 3vh; }
+  body.mobile .combo { font-size: 16px; }
+  body.mobile .count { font-size: min(30vh, 45vw); }
+  body.mobile .keys { display: none; }
+  .pad { grid-column: 1 / 3; grid-row: 3; display: grid; grid-template-columns: 1fr 1fr; gap: 10px;
+    padding: 8px 14px max(16px, env(safe-area-inset-bottom)); }
+  body.mobile .pad { display: grid !important; }
+  .pad button { height: max(64px, 12vh); border: 0; border-radius: 18px; color: #fff; font: inherit; font-size: 20px; font-weight: 600; letter-spacing: .04em;
+    box-shadow: inset 0 -6px 0 rgba(0,0,0,.2); touch-action: manipulation; -webkit-tap-highlight-color: transparent; user-select: none; -webkit-user-select: none; }
+  .pad button:active { transform: translateY(3px); box-shadow: inset 0 -3px 0 rgba(0,0,0,.2); }
+
+  body.mobile #result { flex-direction: column; justify-content: flex-start; gap: 14px; padding: 8px 16px max(20px, env(safe-area-inset-bottom)); }
+  body.mobile .res-main, body.mobile .promo { flex: none; padding: 22px 18px; border-radius: 18px; }
+  body.mobile .res-head { font-size: 13vw; }
+  body.mobile .res-sub { font-size: 16px; }
+  body.mobile .entry { margin-top: 20px; }
+  body.mobile .entry label { font-size: 11px; }
+  body.mobile .entry input { font-size: 22px; padding: 12px 16px; }
+  body.mobile .entry .hint { font-size: 13px; }
+  .m-row { display: flex; gap: 10px; justify-content: center; margin-top: 14px; flex-wrap: wrap; }
+  body.mobile .m-row { display: flex !important; }
+  body.mobile .promo h3 { font-size: 24px; }
+  body.mobile .promo h3 .serif { font-size: 27px; }
+  body.mobile .promo p { font-size: 15px; }
+  body.mobile .promo .when { font-size: 12px; }
+  body.mobile .promo .tag { font-size: 10px; gap: 8px; }
+  body.mobile .tagbar { width: 30px; height: 4px; }
+  body.mobile .qr img { display: none; }
+  body.mobile .qr span { font-size: 11px; }
+  body.mobile .qr span b { font-size: 18px; }
+  .qr a { color: var(--blue-hi); text-decoration: none; }
+
+  body.mobile .d5, body.mobile .d6, body.mobile .d7, body.mobile .d8 { display: none; }
+  body.mobile .d1 { width: 40vw; height: 40vw; left: -26vw; top: 46%; }
+  body.mobile .d2 { width: 26vw; height: 26vw; left: -6vw; bottom: -8vw; border-radius: 4vw; }
+  body.mobile .d3 { width: 18vw; height: 18vw; right: -8vw; top: 25vh; }
+  body.mobile .d4 { width: 44vw; height: 44vw; border-width: 6vw; right: -24vw; bottom: -12vw; }
 </style>
 </head>
 <body>
@@ -182,7 +266,8 @@
       <div class="board" id="board"></div>
       <div class="board-tabs"><span>←</span><i id="tab0" class="on"></i><i id="tab1"></i><span>→</span></div>
     </div>
-    <div class="press">Press <kbd class="k1">1</kbd> for 1v1 · Press <kbd class="k2">2</kbd> for Solo</div>
+    <div class="press d-only">Press <kbd class="k1">1</kbd> for 1v1 · Press <kbd class="k2">2</kbd> for Solo</div>
+    <div class="m-start m-only"><button class="mbtn primary" id="mSolo" type="button">Play Solo · 20s</button><small>Tap the color of the word, not what it says.<br />1v1 mode is on the laptops at our table!</small></div>
     <div class="promo-line"><b>General Meeting 3 —</b> Startups 101 &amp; Google for Startups · Wed Oct 21 · 3–4 PM · LC 207 · Free pizza</div>
   </section>
 
@@ -197,6 +282,7 @@
     </div>
     <div class="keys k-left" id="keysL"></div>
     <div class="keys k-right" id="keysR"></div>
+    <div class="pad m-only" id="pad"></div>
   </section>
 
   <section id="result" class="screen">
@@ -207,8 +293,10 @@
         <label for="nameIn" id="nameLabel">Enter your name for the leaderboard</label>
         <input id="nameIn" maxlength="10" autocomplete="off" spellcheck="false" placeholder="Your name" />
         <div class="hint" id="hint">Enter to save · Esc to skip</div>
+        <div class="m-row m-only"><button class="mbtn primary" id="mSave" type="button">Save score</button></div>
       </div>
-      <div class="res-foot" id="resFoot">Press <kbd>1</kbd> for 1v1 · <kbd>2</kbd> for Solo · <kbd>Esc</kbd> for menu</div>
+      <div class="m-row m-only"><button class="mbtn" id="mAgain" type="button">Play again</button><button class="mbtn" id="mMenu" type="button">Menu</button></div>
+      <div class="res-foot d-only" id="resFoot">Press <kbd>1</kbd> for 1v1 · <kbd>2</kbd> for Solo · <kbd>Esc</kbd> for menu</div>
     </div>
     <aside class="promo">
       <div class="tag"><span class="tagbar"></span>Come to our next meeting</div>
@@ -216,7 +304,7 @@
       <p>Startups 101 &amp; Google for Startups</p>
       <p class="when">Wed Oct 21 · 3–4 PM · LC 207</p>
       <p>Free pizza 🍕</p>
-      <div class="qr"><img src="/game/qr.svg" alt="QR code to gdg-dvc.web.app" /><span>Scan to join us<b>gdg-dvc.web.app</b></span></div>
+      <div class="qr"><img src="/game/qr.svg" alt="QR code to gdg-dvc.web.app" /><span><span class="d-only">Scan to join us</span><span class="m-only">Learn more &amp; join</span><b><a href="https://gdg-dvc.web.app" target="_blank" rel="noopener">gdg-dvc.web.app</a></b></span></div>
     </aside>
   </section>
 </div>
@@ -650,7 +738,7 @@
     g.over = true; g.active = false;
     sfx.win();
     showResult({
-      head: `${g.score} POINTS`,
+      head: `${g.score} POINT${g.score === 1 ? '' : 'S'}`,
       headColor: COLORS[3].hex,
       sub: `Best combo <b>×${g.bestCombo}</b>`,
       label: 'Enter your name for the Solo board',
@@ -676,7 +764,7 @@
     input.disabled = true;
     $('entry').style.display = canSubmit ? '' : 'none';
     $('nameLabel').textContent = r.label;
-    setHint('Enter to save · Esc to skip');
+    setHint(MOBILE ? 'Type your name, then tap Save' : 'Enter to save · Esc to skip');
     $('resFoot').style.visibility = canSubmit ? 'hidden' : 'visible';
     // players are often still mashing keys when the game ends: wait before focusing the box
     if (canSubmit) later(1000, () => { input.disabled = false; input.value = ''; input.focus(); });
@@ -714,7 +802,24 @@
 
   // ---------- input ----------
   let lastInput = now();
-  document.addEventListener('mousedown', () => { lastInput = now(); });
+  document.addEventListener('pointerdown', () => { lastInput = now(); });
+  document.addEventListener('input', () => { lastInput = now(); });
+
+  // ---------- touch controls (phones / tablets) ----------
+  const MOBILE = matchMedia('(pointer: coarse)').matches || innerWidth < 760;
+  if (MOBILE) document.body.classList.add('mobile');
+  $('pad').innerHTML = COLORS.map((c, i) =>
+    `<button type="button" data-c="${i}" style="background:${c.hex}">${c.name}</button>`).join('');
+  $('pad').addEventListener('pointerdown', (e) => {
+    const b = e.target.closest('[data-c]');
+    if (!b) return;
+    e.preventDefault();
+    if (screen === 'play' && G && G.mode === 'solo') soloKey(0, Number(b.dataset.c));
+  });
+  $('mSolo').addEventListener('click', startSolo);
+  $('mSave').addEventListener('click', trySubmit);
+  $('mAgain').addEventListener('click', startSolo);
+  $('mMenu').addEventListener('click', goAttract);
   document.addEventListener('keydown', (e) => {
     lastInput = now();
     if (e.key === 'Escape') { e.preventDefault(); goAttract(); return; }
