@@ -1,0 +1,740 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Color Rush — GDG on Campus DVC</title>
+<link rel="icon" href="/favicon.svg" />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Geist:wght@300;400;500;600;700&family=Geist+Mono:wght@400;500&family=Instrument+Serif:ital@1&display=swap" rel="stylesheet" />
+<style>
+  /* same tokens as the main site (src/styles.css) */
+  :root {
+    --blue: #4285F4; --red: #EA4335; --yellow: #FBBC05; --green: #34A853;
+    --blue-hi: #1a73e8; --red-hi: #d93025; --yellow-hi: #b06000; --green-hi: #188038;
+    --bg: #ffffff; --surface: #ffffff; --surface-2: #f1f3f4;
+    --line: rgba(60, 64, 67, 0.12); --line-2: rgba(60, 64, 67, 0.2);
+    --text: #202124; --text-2: #5f6368; --text-3: #80868b;
+    --f-sans: 'Google Sans', 'Geist', 'Helvetica Neue', Arial, sans-serif;
+    --f-mono: 'Geist Mono', ui-monospace, Menlo, monospace;
+    --f-serif: 'Instrument Serif', 'Times New Roman', serif;
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; height: 100%; overflow: hidden; color: var(--text); font-family: var(--f-sans);
+    -webkit-font-smoothing: antialiased; user-select: none; -webkit-user-select: none; }
+  /* dot grid like the hero section */
+  body { background: var(--bg) radial-gradient(rgba(60,64,67,.13) 1px, transparent 1.2px) 0 0 / 22px 22px; }
+  .pixels { position: fixed; inset: 0; pointer-events: none; z-index: 0; }
+  .pixels i { position: absolute; width: 7px; height: 7px; border-radius: 1px; }
+  #app { position: relative; z-index: 1; height: 100vh; display: flex; flex-direction: column; }
+  .mono { font-family: var(--f-mono); text-transform: uppercase; letter-spacing: .08em; }
+  .serif { font-family: var(--f-serif); font-style: italic; font-weight: 400; letter-spacing: -.01em; }
+  .pix4 { display: inline-grid; grid-template-columns: 1vh 1vh; gap: .35vh; vertical-align: middle; }
+  .pix4 b { width: 1vh; height: 1vh; border-radius: .15vh; }
+  .pix4 b:nth-child(1) { background: var(--red); } .pix4 b:nth-child(2) { background: var(--green); }
+  .pix4 b:nth-child(3) { background: var(--blue); } .pix4 b:nth-child(4) { background: var(--yellow); }
+  .tagbar { display: inline-block; width: 5vh; height: .6vh; border-radius: .3vh; vertical-align: middle;
+    background: linear-gradient(90deg, var(--blue) 0 25%, var(--red) 0 50%, var(--yellow) 0 75%, var(--green) 0); }
+
+  /* top bar */
+  .topbar { flex: 0 0 auto; display: flex; align-items: center; justify-content: space-between; padding: 2vh 2.5vw 1vh; }
+  .brand { display: flex; align-items: center; gap: 1.4vh; font-size: 2.2vh; font-weight: 500; }
+  .brand .mono { font-size: 1.6vh; color: var(--text-3); margin-left: 1vh; }
+  .tools { display: flex; gap: 1vh; }
+  .tools button { font-family: var(--f-mono); text-transform: uppercase; letter-spacing: .06em; font-size: 1.5vh;
+    height: 4.4vh; padding: 0 2vh; border-radius: 999px; border: 0; background: var(--surface-2); color: var(--text); cursor: pointer; }
+  .tools button:hover { background: #e8eaed; }
+
+  .screen { flex: 1 1 auto; min-height: 0; display: none; }
+  .screen.on { display: flex; }
+
+  /* attract */
+  #attract { flex-direction: column; align-items: center; justify-content: space-between; padding: 0 4vw 3vh; }
+  .title { font-size: 15vh; font-weight: 500; letter-spacing: -.055em; line-height: 1; margin: 1vh 0 0; }
+  .subtitle { font-size: 3.4vh; color: var(--text-2); margin: 1.4vh 0 0; }
+  .subtitle .serif { color: var(--text); font-size: 4.4vh; }
+  .board-wrap { width: min(72vh, 90vw); }
+  .board { background: rgba(255, 255, 255, .9); box-shadow: 0 1px 3px rgba(60,64,67,.08); border: 1px solid var(--line); border-radius: 22px; padding: 2.4vh 3vh; height: 44vh; backdrop-filter: blur(6px); }
+  .board h2 { margin: 0 0 1.4vh; font-size: 2.6vh; font-weight: 500; letter-spacing: -.02em; display: flex; justify-content: space-between; align-items: center; }
+  .board h2 small { font-family: var(--f-mono); text-transform: uppercase; letter-spacing: .08em; font-size: 1.4vh; color: var(--text-3); font-weight: 400; }
+  .board ol { list-style: none; margin: 0; padding: 0; }
+  .board li { display: flex; gap: 2vh; font-size: 2.5vh; line-height: 3.5vh; border-bottom: 1px solid var(--line); }
+  .board li:last-child { border-bottom: 0; }
+  .board li .rk { width: 3.5vh; color: var(--text-3); text-align: right; font-family: var(--f-mono); font-size: 1.9vh; }
+  .board li .nm { flex: 1; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
+  .board li .vl { font-variant-numeric: tabular-nums; font-weight: 500; font-family: var(--f-mono); font-size: 2.2vh; }
+  .board .msg { font-size: 2.4vh; color: var(--text-2); text-align: center; padding-top: 14vh; }
+  .board-tabs { display: flex; justify-content: center; gap: 1vh; margin-top: 1.4vh; }
+  .board-tabs i { width: .9vh; height: .9vh; border-radius: .15vh; background: var(--line-2); }
+  .board-tabs i.on { background: var(--text); }
+  .press { font-size: 3.2vh; font-weight: 500; letter-spacing: -.01em; animation: pulse 1.8s ease-in-out infinite; }
+  .press kbd { display: inline-flex; align-items: center; justify-content: center; min-width: 5.4vh; height: 5.4vh; padding: 0 1.4vh;
+    border-radius: 999px; background: #202124; color: #fff; font: inherit; font-weight: 600; margin: 0 .4vh; }
+  @keyframes pulse { 50% { opacity: .6; } }
+  .promo-line { font-family: var(--f-mono); text-transform: uppercase; letter-spacing: .06em; font-size: 1.55vh; color: var(--text-2); text-align: center; }
+  .promo-line b { color: var(--text); font-weight: 500; }
+  .promo-line { background: rgba(255,255,255,.9); padding: .8vh 2vh; border-radius: 999px; }
+
+  /* play */
+  #play { display: none; flex-direction: column; }
+  #play.on { display: grid; grid-template-columns: 1fr 1fr; grid-template-rows: auto 1fr auto; }
+  .side { display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 1vh 2vw; transition: filter .15s, opacity .15s; }
+  .side .who { font-family: var(--f-mono); text-transform: uppercase; font-size: 1.8vh; letter-spacing: .12em; color: var(--text-2); }
+  .side .big { font-size: 13vh; font-weight: 500; letter-spacing: -.05em; line-height: 1; font-variant-numeric: tabular-nums; position: relative; margin: .6vh 0; }
+  .side .note { font-family: var(--f-mono); text-transform: uppercase; letter-spacing: .1em; font-size: 1.7vh; height: 2.6vh; color: var(--text-3); }
+  .side.locked { filter: grayscale(1); opacity: .3; }
+  .side.locked .note { color: var(--red-hi); }
+  .side.hit .big { animation: pop .3s ease-out; }
+  .side.miss .big { animation: shake .3s ease-out; }
+  @keyframes pop { 40% { transform: scale(1.16); } }
+  @keyframes shake { 25% { transform: translateX(-1.2vh); } 75% { transform: translateX(1.2vh); } }
+  .s-left { grid-column: 1; grid-row: 1; border-right: 1px solid var(--line-2); }
+  .s-right { grid-column: 2; grid-row: 1; }
+  .stage { grid-column: 1 / 3; grid-row: 2; position: relative; display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 0; }
+  .word { font-size: 24vh; font-weight: 600; line-height: 1; letter-spacing: -.045em; height: 24vh; }
+  .word.blank { visibility: hidden; }
+  .timer { width: 50vw; height: .6vh; background: var(--line-2); border-radius: 1vh; overflow: hidden; margin-top: 3.5vh; }
+  .timer i { display: block; height: 100%; width: 100%; background: var(--text-2); }
+  .combo { position: absolute; top: 1vh; font-family: var(--f-mono); text-transform: uppercase; letter-spacing: .1em; font-size: 3vh; color: var(--green-hi); height: 4vh; }
+  .count { position: absolute; inset: 0; display: none; align-items: center; justify-content: center; font-size: 30vh; font-weight: 500; letter-spacing: -.05em; }
+  .count.on { display: flex; }
+  .count.on ~ .word, .count.on ~ .timer { visibility: hidden; }
+  .k-left { grid-column: 1; grid-row: 3; border-right: 1px solid var(--line-2); }
+  .k-right { grid-column: 2; grid-row: 3; }
+  .keys { display: flex; justify-content: center; gap: 1.6vh; padding: 1vh 2vw 3.5vh; transition: filter .15s, opacity .15s; }
+  .keys.locked { filter: grayscale(1); opacity: .3; }
+  .cap { width: 10vh; text-align: center; }
+  .cap b { display: flex; align-items: center; justify-content: center; height: 10vh; border-radius: 1.6vh; color: #fff; font-size: 4.6vh; font-weight: 500;
+    box-shadow: inset 0 -.8vh 0 rgba(0,0,0,.22); }
+  .cap span { display: block; font-family: var(--f-mono); font-size: 1.4vh; margin-top: .9vh; color: var(--text-2); letter-spacing: .08em; }
+  .cap.down b { transform: translateY(.4vh); box-shadow: inset 0 -.3vh 0 rgba(0,0,0,.22); }
+
+  /* result */
+  #result { align-items: stretch; justify-content: center; gap: 2.5vw; padding: 1vh 2.5vw 3.5vh; }
+  .res-main, .promo { background: rgba(255, 255, 255, .9); box-shadow: 0 1px 3px rgba(60,64,67,.08); border: 1px solid var(--line); border-radius: 22px; padding: 3vh 3vw; display: flex; flex-direction: column; backdrop-filter: blur(6px); }
+  .res-main { flex: 1.25; align-items: center; justify-content: center; text-align: center; }
+  .res-head { font-size: 11vh; font-weight: 500; letter-spacing: -.05em; line-height: 1; }
+  .res-sub { font-size: 2.8vh; margin-top: 2.2vh; color: var(--text-2); line-height: 1.5; }
+  .res-sub b { color: var(--text); font-weight: 500; font-variant-numeric: tabular-nums; }
+  .entry { margin-top: 4vh; width: 100%; max-width: 58vh; }
+  .entry label { display: block; font-family: var(--f-mono); text-transform: uppercase; letter-spacing: .06em; font-size: 1.5vh; color: var(--text-2); margin-bottom: 1.2vh; line-height: 1.5; }
+  .entry input { width: 100%; font: inherit; font-size: 4vh; font-weight: 500; padding: 1.2vh 2vh; border: 1px solid var(--line-2); border-radius: 999px;
+    text-align: center; outline: none; background: var(--surface-2); color: var(--text); user-select: text; -webkit-user-select: text; }
+  .entry input::placeholder { color: var(--text-3); }
+  .entry input:focus { border-color: var(--blue-hi); box-shadow: 0 0 0 3px rgba(26,115,232,.15); background: #fff; }
+  .entry .hint { font-size: 1.9vh; color: var(--text-3); margin-top: 1.2vh; min-height: 2.6vh; }
+  .entry .hint.err { color: var(--red-hi); }
+  .res-foot { margin-top: 3vh; font-size: 2.1vh; color: var(--text-2); }
+  .res-foot kbd { font: inherit; font-weight: 600; color: var(--text); }
+  .promo { flex: 1; justify-content: center; gap: 1.6vh; }
+  .promo .tag { display: flex; align-items: center; gap: 1.4vh; font-family: var(--f-mono); text-transform: uppercase; font-size: 1.5vh; letter-spacing: .08em; color: var(--text-2); }
+  .promo h3 { margin: 0; font-size: 4vh; font-weight: 400; letter-spacing: -.04em; line-height: 1.08; color: var(--text); }
+  .promo h3 .serif { font-size: 4.4vh; }
+  .promo p { margin: 0; font-size: 2.3vh; line-height: 1.4; color: var(--text-2); }
+  .promo .when { font-family: var(--f-mono); text-transform: uppercase; letter-spacing: .06em; font-size: 1.9vh; color: var(--yellow-hi); }
+  .qr { display: flex; align-items: center; gap: 2.2vh; margin-top: 1.2vh; }
+  .qr img { width: 19vh; height: 19vh; image-rendering: pixelated; border-radius: 1.4vh; background: #fff; padding: .8vh; border: 1px solid var(--line-2); }
+  .qr span { font-family: var(--f-mono); text-transform: uppercase; letter-spacing: .06em; font-size: 1.5vh; color: var(--text-2); }
+  .qr span b { color: var(--text); display: block; font-family: var(--f-sans); text-transform: none; letter-spacing: -.01em; font-size: 2.6vh; font-weight: 500; margin-top: .6vh; }
+  /* flat Google-color shapes around the edges (toned down while a game is on so they don't compete with the word) */
+  .stripe { position: fixed; top: 0; left: 0; right: 0; height: .7vh; z-index: 2;
+    background: linear-gradient(90deg, var(--blue) 0 25%, var(--red) 0 50%, var(--yellow) 0 75%, var(--green) 0); }
+  .deco { position: fixed; inset: 0; pointer-events: none; z-index: 0; overflow: hidden; transition: opacity .3s; }
+  body[data-screen="play"] .deco, body[data-screen="play"] .pixels { opacity: .18; }
+  .deco i { position: absolute; display: block; }
+  .d1 { width: 44vh; height: 44vh; border-radius: 50%; background: var(--blue); left: -20vh; top: 24vh; }
+  .d2 { width: 19vh; height: 19vh; border-radius: 2.6vh; background: var(--red); left: 1vh; bottom: -6vh; transform: rotate(-14deg); }
+  .d3 { width: 17vh; height: 17vh; border-radius: 50%; background: var(--yellow); right: 9vh; top: 10vh; }
+  .d4 { width: 38vh; height: 38vh; border-radius: 50%; border: 5.5vh solid var(--green); right: -15vh; bottom: -11vh; }
+  .d5 { width: 6.5vh; height: 6.5vh; border-radius: 1.2vh; background: var(--blue); right: 25vh; bottom: 31vh; transform: rotate(22deg); }
+  .d6 { width: 7vh; height: 7vh; border-radius: 50%; border: 1.5vh solid var(--red); left: 14vh; top: 15vh; }
+  .d7 { width: 4.5vh; height: 4.5vh; border-radius: 50%; background: var(--yellow); left: 27vh; bottom: 30vh; }
+  .d8 { width: 0; height: 0; border-left: 4vh solid transparent; border-right: 4vh solid transparent; border-bottom: 7vh solid var(--green);
+    left: 11vh; top: 66vh; transform: rotate(-12deg); }
+  .board { position: relative; overflow: hidden; }
+  .board::before { content: ''; position: absolute; left: 0; right: 0; top: 0; height: .7vh;
+    background: linear-gradient(90deg, var(--blue) 0 25%, var(--red) 0 50%, var(--yellow) 0 75%, var(--green) 0); }
+  .press kbd.k1 { background: var(--blue); } .press kbd.k2 { background: var(--red); }
+</style>
+</head>
+<body>
+<div class="stripe"></div>
+<div class="deco"><i class="d1"></i><i class="d2"></i><i class="d3"></i><i class="d4"></i><i class="d5"></i><i class="d6"></i><i class="d7"></i><i class="d8"></i></div>
+<div class="pixels" id="pixels"></div>
+<div id="app">
+  <header class="topbar">
+    <div class="brand"><span class="pix4"><b></b><b></b><b></b><b></b></span>GDG on Campus DVC<span class="mono">Color Rush</span></div>
+    <div class="tools">
+      <button id="fsBtn" type="button" tabindex="-1">Fullscreen</button>
+      <button id="muteBtn" type="button" tabindex="-1">Sound: ON</button>
+    </div>
+  </header>
+
+  <section id="attract" class="screen on">
+    <div style="text-align:center">
+      <h1 class="title" id="title"></h1>
+      <p class="subtitle">Press the <span class="serif">color</span>, not the word</p>
+    </div>
+    <div class="board-wrap">
+      <div class="board" id="board"></div>
+      <div class="board-tabs"><i id="tab0" class="on"></i><i id="tab1"></i></div>
+    </div>
+    <div class="press">Press <kbd class="k1">1</kbd> for 1v1 · Press <kbd class="k2">2</kbd> for Solo</div>
+    <div class="promo-line"><b>General Meeting 3 —</b> Startups 101 &amp; Google for Startups · Wed Oct 21 · 3–4 PM · LC 207 · Free pizza</div>
+  </section>
+
+  <section id="play" class="screen">
+    <div class="side s-left" id="sideL"><div class="who" id="whoL">LEFT</div><div class="big" id="bigL">0</div><div class="note" id="noteL"></div></div>
+    <div class="side s-right" id="sideR"><div class="who" id="whoR">RIGHT</div><div class="big" id="bigR">0</div><div class="note" id="noteR"></div></div>
+    <div class="stage">
+      <div class="combo" id="combo"></div>
+      <div class="count" id="count">3</div>
+      <div class="word blank" id="word">RED</div>
+      <div class="timer"><i id="timerBar"></i></div>
+    </div>
+    <div class="keys k-left" id="keysL"></div>
+    <div class="keys k-right" id="keysR"></div>
+  </section>
+
+  <section id="result" class="screen">
+    <div class="res-main">
+      <div class="res-head" id="resHead">LEFT WINS</div>
+      <div class="res-sub" id="resSub"></div>
+      <div class="entry" id="entry">
+        <label for="nameIn" id="nameLabel">Enter your name for the leaderboard</label>
+        <input id="nameIn" maxlength="10" autocomplete="off" spellcheck="false" placeholder="Your name" />
+        <div class="hint" id="hint">Enter to save · Esc to skip</div>
+      </div>
+      <div class="res-foot" id="resFoot">Press <kbd>1</kbd> for 1v1 · <kbd>2</kbd> for Solo · <kbd>Esc</kbd> for menu</div>
+    </div>
+    <aside class="promo">
+      <div class="tag"><span class="tagbar"></span>Come to our next meeting</div>
+      <h3>GDG on Campus DVC<br />General Meeting <span class="serif">3</span></h3>
+      <p>Startups 101 &amp; Google for Startups</p>
+      <p class="when">Wed Oct 21 · 3–4 PM · LC 207</p>
+      <p>Free pizza 🍕</p>
+      <div class="qr"><img src="/game/qr.svg" alt="QR code to gdg-dvc.web.app" /><span>Scan to join us<b>gdg-dvc.web.app</b></span></div>
+    </aside>
+  </section>
+</div>
+
+<script>
+(() => {
+  'use strict';
+
+  // ---------- config ----------
+  const COLORS = [
+    { name: 'BLUE', hex: '#4285F4' },
+    { name: 'RED', hex: '#EA4335' },
+    { name: 'YELLOW', hex: '#FBBC05' },
+    { name: 'GREEN', hex: '#34A853' },
+  ];
+  const LEFT_KEYS = { KeyA: 0, KeyS: 1, KeyD: 2, KeyF: 3 };
+  const RIGHT_KEYS = { KeyJ: 0, KeyK: 1, KeyL: 2, Semicolon: 3 };
+  const LEFT_LABELS = ['A', 'S', 'D', 'F'];
+  const RIGHT_LABELS = ['J', 'K', 'L', ';'];
+  const MISMATCH = 0.8;          // chance the word and its ink differ
+  const WIN_SCORE = 10;
+  const LOCK_MS = 500;
+  const GAP_MS = 220;            // blank pause between 1v1 rounds
+  const SOLO_MS = 20000;
+  const IDLE_MS = 30000;
+  const BOARD_SWAP_MS = 8000;
+
+  // Firestore REST (no SDK, no API key needed; access is governed by firestore.rules).
+  // ?emu=127.0.0.1:8080 points at the local Firestore emulator for testing.
+  const PROJECT = 'gdg-dvc';
+  const COLL = 'colorRushScores';
+  const emu = new URLSearchParams(location.search).get('emu');
+  const DB_PATH = `projects/${PROJECT}/databases/(default)/documents`;
+  const API = (emu ? `http://${emu}` : 'https://firestore.googleapis.com') + `/v1/${DB_PATH}`;
+
+  const BAD_WORDS = ['fuck', 'fuk', 'shit', 'bitch', 'cunt', 'dick', 'cock', 'pussy', 'nigg', 'nigga', 'fag', 'slut', 'whore',
+    'rape', 'porn', 'penis', 'vagina', 'asshole', 'bastard', 'retard', 'nazi', 'hitler', 'kys', 'tits', 'boob', 'jizz',
+    'twat', 'wank', 'dildo', 'horny', 'milf', 'fck', 'stfu', 'motherf'];
+
+  // ---------- helpers ----------
+  const $ = (id) => document.getElementById(id);
+  const rnd = (n) => Math.floor(Math.random() * n);
+  const now = () => performance.now();
+  const storage = {
+    get(k) { try { return localStorage.getItem(k); } catch { return null; } },
+    set(k, v) { try { localStorage.setItem(k, v); } catch {} },
+  };
+
+  // every pending timer goes through here so Esc / reset can cancel all of them
+  let timers = [];
+  function later(ms, fn) { const t = setTimeout(fn, ms); timers.push(t); return t; }
+  function clearTimers() { timers.forEach(clearTimeout); timers = []; }
+
+  function nextStim(prev) {
+    for (;;) {
+      const ink = rnd(4);
+      const word = Math.random() < MISMATCH ? (ink + 1 + rnd(3)) % 4 : ink;
+      if (!prev || prev.ink !== ink || prev.word !== word) return { word, ink };
+    }
+  }
+
+  // ---------- sound ----------
+  let actx = null;
+  let muted = storage.get('cr-muted') === '1';
+  function beep(freq, dur, type = 'sine', when = 0, vol = 0.18) {
+    if (muted) return;
+    try {
+      if (!actx) actx = new (window.AudioContext || window.webkitAudioContext)();
+      if (actx.state === 'suspended') actx.resume();
+      const t = actx.currentTime + when;
+      const o = actx.createOscillator();
+      const g = actx.createGain();
+      o.type = type; o.frequency.setValueAtTime(freq, t);
+      g.gain.setValueAtTime(vol, t);
+      g.gain.exponentialRampToValueAtTime(0.0001, t + dur);
+      o.connect(g).connect(actx.destination);
+      o.start(t); o.stop(t + dur + 0.02);
+    } catch {}
+  }
+  const sfx = {
+    good() { beep(880, 0.09, 'sine'); beep(1320, 0.1, 'sine', 0.06); },
+    bad() { beep(160, 0.22, 'square', 0, 0.09); },
+    tick() { beep(600, 0.08, 'triangle'); },
+    go() { beep(1000, 0.18, 'triangle'); },
+    win() { [523, 659, 784, 1047].forEach((f, i) => beep(f, 0.22, 'triangle', i * 0.12)); },
+  };
+  function renderMute() { $('muteBtn').textContent = muted ? 'Sound: OFF' : 'Sound: ON'; }
+  $('muteBtn').addEventListener('click', (e) => {
+    muted = !muted; storage.set('cr-muted', muted ? '1' : '0'); renderMute(); e.currentTarget.blur();
+  });
+  renderMute();
+
+  $('fsBtn').addEventListener('click', (e) => {
+    e.currentTarget.blur();
+    try {
+      if (document.fullscreenElement) document.exitFullscreen();
+      else document.documentElement.requestFullscreen();
+    } catch {}
+  });
+  document.addEventListener('fullscreenchange', () => {
+    $('fsBtn').textContent = document.fullscreenElement ? 'Exit fullscreen' : 'Fullscreen';
+  });
+
+  // ---------- static UI ----------
+  $('title').innerHTML = 'COLOR RUSH'.split('').map((ch, i) =>
+    ch === ' ' ? ' ' : `<span style="color:${COLORS[i % 4].hex}">${ch}</span>`).join('');
+
+  function buildKeys(el, labels) {
+    el.innerHTML = labels.map((k, i) =>
+      `<div class="cap" data-c="${i}"><b style="background:${COLORS[i].hex}">${k}</b><span>${COLORS[i].name}</span></div>`).join('');
+  }
+  // scattered four-color pixels, like the hero section of the main site
+  $('pixels').innerHTML = Array.from({ length: 24 }, () =>
+    `<i style="left:${(Math.random() < 0.5 ? Math.random() * 22 : 78 + Math.random() * 22).toFixed(2)}%;top:${(Math.random() * 100).toFixed(2)}%;` +
+    `background:${COLORS[rnd(4)].hex};opacity:${(0.25 + Math.random() * 0.45).toFixed(2)}"></i>`).join('');
+
+  buildKeys($('keysL'), LEFT_LABELS);
+  buildKeys($('keysR'), RIGHT_LABELS);
+
+  function pressCap(side, c) {
+    const cap = $(side === 0 ? 'keysL' : 'keysR').children[c];
+    if (!cap) return;
+    cap.classList.add('down');
+    setTimeout(() => cap.classList.remove('down'), 90);
+  }
+
+  // ---------- screens ----------
+  let screen = 'attract';
+  let G = null; // current game state
+  function show(id) {
+    screen = id;
+    document.body.dataset.screen = id;
+    ['attract', 'play', 'result'].forEach((s) => $(s).classList.toggle('on', s === id));
+  }
+
+  // ---------- leaderboard ----------
+  const boards = { solo: undefined, versus: undefined }; // undefined = loading, null = offline, [] = empty
+  let boardIdx = 0;
+  let boardTimer = null;
+
+  async function fsFetch(path, body, ms = 5000) {
+    const ctl = new AbortController();
+    const t = setTimeout(() => ctl.abort(), ms);
+    try {
+      const r = await fetch(`${API}${path}`, {
+        method: 'POST', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(body), signal: ctl.signal,
+      });
+      if (!r.ok) throw new Error(`HTTP ${r.status}`);
+      return await r.json();
+    } finally { clearTimeout(t); }
+  }
+
+  async function loadBoard(mode) {
+    const field = mode === 'solo' ? 'score' : 'avgMs';
+    try {
+      const rows = await fsFetch(':runQuery', {
+        structuredQuery: {
+          from: [{ collectionId: COLL }],
+          where: { fieldFilter: { field: { fieldPath: 'mode' }, op: 'EQUAL', value: { stringValue: mode } } },
+          orderBy: [{ field: { fieldPath: field }, direction: mode === 'solo' ? 'DESCENDING' : 'ASCENDING' }],
+          limit: 10,
+        },
+      });
+      boards[mode] = rows.filter((r) => r.document).map((r) => {
+        const f = r.document.fields || {};
+        return { name: (f.name && f.name.stringValue) || '?', value: Number((f[field] && f[field].integerValue) || 0) };
+      });
+    } catch (err) {
+      console.warn('Leaderboard offline:', err);
+      boards[mode] = null;
+    }
+  }
+
+  async function refreshBoards() {
+    await Promise.all([loadBoard('solo'), loadBoard('versus')]);
+    if (screen === 'attract') renderBoard();
+  }
+
+  function renderBoard() {
+    const mode = boardIdx === 0 ? 'solo' : 'versus';
+    const rows = boards[mode];
+    const title = mode === 'solo'
+      ? 'Solo — Top Scores <small>20 seconds</small>'
+      : '1v1 — Fastest Reaction <small>winner’s average</small>';
+    const el = $('board');
+    el.innerHTML = `<h2>${title}</h2>`;
+    if (rows === undefined) {
+      el.insertAdjacentHTML('beforeend', '<div class="msg">Loading…</div>');
+    } else if (rows === null) {
+      el.insertAdjacentHTML('beforeend', '<div class="msg">Leaderboard offline</div>');
+    } else if (!rows.length) {
+      el.insertAdjacentHTML('beforeend', '<div class="msg">No scores yet — be the first!</div>');
+    } else {
+      const ol = document.createElement('ol');
+      rows.forEach((row, i) => {
+        const li = document.createElement('li');
+        li.innerHTML = '<span class="rk"></span><span class="nm"></span><span class="vl"></span>';
+        li.children[0].textContent = i + 1;
+        li.children[1].textContent = row.name;
+        li.children[2].textContent = mode === 'solo' ? row.value : `${row.value} ms`;
+        if (i < 3) li.children[2].style.color = COLORS[i].hex;
+        ol.appendChild(li);
+      });
+      el.appendChild(ol);
+    }
+    $('tab0').classList.toggle('on', boardIdx === 0);
+    $('tab1').classList.toggle('on', boardIdx === 1);
+  }
+
+  function cleanName(raw) {
+    return Array.from(String(raw).replace(/[^\p{L}\p{N} ._-]/gu, '').replace(/\s+/g, ' ').trim()).slice(0, 10).join('').trim();
+  }
+  function isRude(name) {
+    const n = name.toLowerCase()
+      .replace(/0/g, 'o').replace(/1/g, 'i').replace(/3/g, 'e').replace(/4/g, 'a').replace(/5/g, 's').replace(/7/g, 't')
+      .replace(/[^a-z]/g, '');
+    return BAD_WORDS.some((w) => n.includes(w));
+  }
+
+  async function submitScore(name, mode, value) {
+    const fields = { name: { stringValue: name }, mode: { stringValue: mode } };
+    if (mode === 'solo') fields.score = { integerValue: String(value) };
+    else fields.avgMs = { integerValue: String(value) };
+    const id = Array.from(crypto.getRandomValues(new Uint8Array(10)), (b) => b.toString(16).padStart(2, '0')).join('');
+    await fsFetch(':commit', {
+      writes: [{
+        update: { name: `${DB_PATH}/${COLL}/${id}`, fields },
+        currentDocument: { exists: false },
+        updateTransforms: [{ fieldPath: 'createdAt', setToServerValue: 'REQUEST_TIME' }],
+      }],
+    });
+  }
+
+  // ---------- attract ----------
+  function goAttract() {
+    clearTimers();
+    G = null;
+    $('nameIn').blur();
+    show('attract');
+    boardIdx = 0;
+    renderBoard();
+    refreshBoards();
+    clearInterval(boardTimer);
+    boardTimer = setInterval(() => {
+      boardIdx = 1 - boardIdx;
+      renderBoard();
+      if (boardIdx === 0) refreshBoards();
+    }, BOARD_SWAP_MS);
+  }
+
+  // ---------- shared play UI ----------
+  function setWord(stim) {
+    const w = $('word');
+    if (!stim) { w.classList.add('blank'); return; }
+    w.textContent = COLORS[stim.word].name;
+    w.style.color = COLORS[stim.ink].hex;
+    w.dataset.ink = stim.ink; // used by automated tests
+    w.classList.remove('blank');
+  }
+  function runTimerBar(ms) {
+    const bar = $('timerBar');
+    bar.style.transition = 'none';
+    bar.style.width = '100%';
+    void bar.offsetWidth;
+    bar.style.transition = `width ${ms}ms linear`;
+    bar.style.width = '0%';
+  }
+  function flash(side, cls) {
+    const el = $(side === 0 ? 'sideL' : 'sideR');
+    el.classList.remove('hit', 'miss');
+    void el.offsetWidth;
+    el.classList.add(cls);
+  }
+  function setLocked(side, on) {
+    $(side === 0 ? 'sideL' : 'sideR').classList.toggle('locked', on);
+    $(side === 0 ? 'keysL' : 'keysR').classList.toggle('locked', on);
+    $(side === 0 ? 'noteL' : 'noteR').textContent = on ? 'LOCKED' : '';
+  }
+  function resetPlayUI() {
+    setWord(null);
+    setLocked(0, false); setLocked(1, false);
+    $('combo').textContent = '';
+    $('noteL').textContent = ''; $('noteR').textContent = '';
+    const bar = $('timerBar'); bar.style.transition = 'none'; bar.style.width = '100%';
+  }
+  function countdown(then) {
+    const c = $('count');
+    c.classList.add('on');
+    [3, 2, 1].forEach((n, i) => later(i * 800, () => { c.textContent = n; c.style.color = COLORS[i].hex; sfx.tick(); }));
+    later(2400, () => { c.classList.remove('on'); sfx.go(); then(); });
+  }
+
+  // ---------- 1v1 ----------
+  function startVersus() {
+    clearTimers();
+    G = { mode: 'versus', scores: [0, 0], rts: [[], []], lockUntil: [0, 0], rounds: 0, stim: null, active: false, roundId: 0, over: false };
+    show('play');
+    resetPlayUI();
+    $('whoL').textContent = 'LEFT PLAYER'; $('whoR').textContent = 'RIGHT PLAYER';
+    $('bigL').textContent = '0'; $('bigR').textContent = '0';
+    $('keysL').style.visibility = $('keysR').style.visibility = 'visible';
+    $('noteL').textContent = $('noteR').textContent = '';
+    countdown(nextRound);
+  }
+  function roundLimit() { return Math.max(800, 2000 - G.rounds * 50); }
+  function nextRound() {
+    const g = G;
+    g.active = false;
+    setWord(null);
+    later(GAP_MS, () => {
+      if (G !== g || g.over) return;
+      g.stim = nextStim(g.stim);
+      setWord(g.stim);
+      g.shownAt = now();
+      g.active = true;
+      const id = ++g.roundId;
+      const limit = roundLimit();
+      runTimerBar(limit);
+      later(limit, () => {
+        if (G !== g || g.roundId !== id || !g.active) return;
+        g.rounds++;   // timeout: nobody scored
+        nextRound();
+      });
+    });
+  }
+  function versusKey(side, c) {
+    const g = G;
+    pressCap(side, c);
+    if (!g.active || g.over) return;
+    const t = now();
+    if (t < g.lockUntil[side]) return;
+    if (c === g.stim.ink) {
+      g.active = false;
+      g.rounds++;
+      g.scores[side]++;
+      g.rts[side].push(t - g.shownAt);
+      $(side === 0 ? 'bigL' : 'bigR').textContent = g.scores[side];
+      flash(side, 'hit');
+      if (g.scores[side] >= WIN_SCORE) { endVersus(side); return; }
+      sfx.good();
+      nextRound();
+    } else {
+      g.scores[side] = Math.max(0, g.scores[side] - 1);
+      $(side === 0 ? 'bigL' : 'bigR').textContent = g.scores[side];
+      g.lockUntil[side] = t + LOCK_MS;
+      flash(side, 'miss');
+      sfx.bad();
+      setLocked(side, true);
+      later(LOCK_MS, () => { if (G === g) setLocked(side, false); });
+    }
+  }
+  const avg = (a) => (a.length ? Math.round(a.reduce((x, y) => x + y, 0) / a.length) : null);
+  function endVersus(winner) {
+    const g = G;
+    g.over = true;
+    sfx.win();
+    const a = [avg(g.rts[0]), avg(g.rts[1])];
+    const fmt = (v) => (v === null ? '—' : `${v} ms`);
+    showResult({
+      head: winner === 0 ? 'LEFT WINS' : 'RIGHT WINS',
+      headColor: winner === 0 ? COLORS[0].hex : COLORS[1].hex,
+      sub: `${g.scores[0]} – ${g.scores[1]}<br>Avg reaction · Left <b>${fmt(a[0])}</b> · Right <b>${fmt(a[1])}</b>`,
+      label: `${winner === 0 ? 'Left' : 'Right'} player — enter your name for the 1v1 Fastest Reaction board`,
+      mode: 'versus',
+      value: a[winner],
+    });
+  }
+
+  // ---------- solo ----------
+  function startSolo() {
+    clearTimers();
+    G = { mode: 'solo', score: 0, combo: 0, bestCombo: 0, stim: null, active: false, over: false, endAt: 0 };
+    show('play');
+    resetPlayUI();
+    $('whoL').textContent = 'SCORE'; $('whoR').textContent = 'TIME';
+    $('bigL').textContent = '0'; $('bigR').textContent = '20';
+    $('noteL').textContent = 'A S D F'; $('noteR').textContent = 'or J K L ;';
+    countdown(() => {
+      const g = G;
+      g.endAt = now() + SOLO_MS;
+      g.active = true;
+      g.stim = nextStim(null);
+      setWord(g.stim);
+      runTimerBar(SOLO_MS);
+      const tick = () => {
+        if (G !== g || g.over) return;
+        const left = g.endAt - now();
+        $('bigR').textContent = Math.max(0, Math.ceil(left / 1000));
+        if (left <= 0) endSolo(); else later(100, tick);
+      };
+      tick();
+    });
+  }
+  function soloKey(side, c) {
+    const g = G;
+    pressCap(side, c);
+    if (!g.active || g.over) return;
+    if (c === g.stim.ink) {
+      g.score = Math.min(300, g.score + 1);
+      g.combo++;
+      g.bestCombo = Math.max(g.bestCombo, g.combo);
+      flash(0, 'hit');
+      sfx.good();
+    } else {
+      g.score = Math.max(0, g.score - 1);
+      g.combo = 0;
+      flash(0, 'miss');
+      sfx.bad();
+    }
+    $('bigL').textContent = g.score;
+    $('combo').textContent = g.combo >= 5 ? `COMBO ×${g.combo}` : '';
+    g.stim = nextStim(g.stim);
+    setWord(g.stim);
+  }
+  function endSolo() {
+    const g = G;
+    g.over = true; g.active = false;
+    sfx.win();
+    showResult({
+      head: `${g.score} POINTS`,
+      headColor: COLORS[3].hex,
+      sub: `Best combo <b>×${g.bestCombo}</b>`,
+      label: 'Enter your name for the Solo board',
+      mode: 'solo',
+      value: g.score,
+    });
+  }
+
+  // ---------- result ----------
+  let pending = null; // what the name entry would submit
+  function showResult(r) {
+    clearTimers();
+    show('result');
+    $('resHead').textContent = r.head;
+    $('resHead').style.color = r.headColor;
+    $('resSub').innerHTML = r.sub;
+    const canSubmit = r.mode === 'solo'
+      ? r.value >= 1
+      : r.value !== null && r.value >= 100 && r.value <= 5000;
+    pending = canSubmit ? { mode: r.mode, value: r.value, busy: false } : null;
+    const input = $('nameIn');
+    input.value = '';
+    input.disabled = true;
+    $('entry').style.display = canSubmit ? '' : 'none';
+    $('nameLabel').textContent = r.label;
+    setHint('Enter to save · Esc to skip');
+    $('resFoot').style.visibility = canSubmit ? 'hidden' : 'visible';
+    // players are often still mashing keys when the game ends: wait before focusing the box
+    if (canSubmit) later(1000, () => { input.disabled = false; input.value = ''; input.focus(); });
+  }
+  function setHint(text, err) {
+    $('hint').textContent = text;
+    $('hint').classList.toggle('err', !!err);
+  }
+  async function trySubmit() {
+    if (!pending || pending.busy) return;
+    const name = cleanName($('nameIn').value);
+    if (!name) { setHint('Type a name first (1–10 characters)', true); return; }
+    if (isRude(name)) { setHint('Please pick a different name', true); return; }
+    pending.busy = true;
+    $('nameIn').value = name;
+    $('nameIn').disabled = true;
+    setHint('Saving…');
+    const p = pending;
+    try {
+      await submitScore(name, p.mode, p.value);
+      if (pending !== p) return;
+      setHint('Saved! See you on the leaderboard.');
+      pending = null;
+      $('resFoot').style.visibility = 'visible';
+      boardIdx = p.mode === 'solo' ? 0 : 1;
+      later(2500, () => { if (screen === 'result') { goAttract(); boardIdx = p.mode === 'solo' ? 0 : 1; renderBoard(); } });
+    } catch (err) {
+      console.warn('Submit failed:', err);
+      if (pending !== p) return;
+      setHint('Leaderboard offline — score not saved', true);
+      pending = null;
+      $('resFoot').style.visibility = 'visible';
+    }
+  }
+
+  // ---------- input ----------
+  let lastInput = now();
+  document.addEventListener('mousedown', () => { lastInput = now(); });
+  document.addEventListener('keydown', (e) => {
+    lastInput = now();
+    if (e.key === 'Escape') { e.preventDefault(); goAttract(); return; }
+
+    if (screen === 'result' && document.activeElement === $('nameIn')) {
+      if (e.key === 'Enter') { e.preventDefault(); trySubmit(); }
+      return; // let the input take the typing
+    }
+    if (e.repeat) return;
+
+    if (screen === 'attract' || (screen === 'result' && !pending)) {
+      if (e.code === 'Digit1' || e.code === 'Numpad1') { e.preventDefault(); startVersus(); }
+      else if (e.code === 'Digit2' || e.code === 'Numpad2') { e.preventDefault(); startSolo(); }
+      return;
+    }
+    if (screen !== 'play' || !G) return;
+
+    const side = e.code in LEFT_KEYS ? 0 : e.code in RIGHT_KEYS ? 1 : -1;
+    if (side < 0) return;
+    e.preventDefault();
+    const c = side === 0 ? LEFT_KEYS[e.code] : RIGHT_KEYS[e.code];
+    if (G.mode === 'versus') versusKey(side, c);
+    else soloKey(side, c);
+  });
+
+  // unattended laptop: drift back to the attract screen
+  setInterval(() => {
+    if (screen !== 'attract' && now() - lastInput > IDLE_MS) goAttract();
+  }, 1000);
+
+  // test hook for automated play-throughs
+  window.__colorRush = { state: () => ({ screen, G }) };
+
+  goAttract();
+})();
+</script>
+</body>
+</html>

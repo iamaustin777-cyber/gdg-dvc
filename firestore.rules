@@ -1,0 +1,28 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // Color Rush leaderboard (/game): anyone can read the top 10 and add a score,
+    // nobody can edit or delete. Other collections stay closed (Firestore default deny).
+    match /colorRushScores/{scoreId} {
+      allow get: if true;
+      allow list: if request.query.limit <= 50;
+      allow create: if validScore(request.resource.data);
+      allow update, delete: if false;
+    }
+
+    function validScore(d) {
+      return d.name is string && d.name.size() >= 1 && d.name.size() <= 10
+        && d.createdAt == request.time
+        && (
+          (d.mode == 'solo'
+            && d.keys().hasOnly(['name', 'mode', 'score', 'createdAt'])
+            && d.score is int && d.score >= 0 && d.score <= 300)
+          ||
+          (d.mode == 'versus'
+            && d.keys().hasOnly(['name', 'mode', 'avgMs', 'createdAt'])
+            && d.avgMs is int && d.avgMs >= 100 && d.avgMs <= 5000)
+        );
+    }
+  }
+}
