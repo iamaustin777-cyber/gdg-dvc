@@ -66,7 +66,9 @@
   .board li .vl { font-variant-numeric: tabular-nums; font-weight: 500; font-family: var(--f-mono); font-size: 2.2vh; }
   .board .msg { font-size: 2.4vh; color: var(--text-2); text-align: center; padding-top: 14vh; }
   .board-tabs { display: flex; justify-content: center; gap: 1vh; margin-top: 1.4vh; }
-  .board-tabs i { width: .9vh; height: .9vh; border-radius: .15vh; background: var(--line-2); }
+  .board-tabs { align-items: center; }
+  .board-tabs i { width: .9vh; height: .9vh; border-radius: .15vh; background: var(--line-2); cursor: pointer; }
+  .board-tabs span { font-family: var(--f-mono); font-size: 1.3vh; letter-spacing: .08em; color: var(--text-3); margin: 0 .6vh; }
   .board-tabs i.on { background: var(--text); }
   .press { font-size: 3.2vh; font-weight: 500; letter-spacing: -.01em; animation: pulse 1.8s ease-in-out infinite; }
   .press kbd { display: inline-flex; align-items: center; justify-content: center; min-width: 5.4vh; height: 5.4vh; padding: 0 1.4vh;
@@ -178,7 +180,7 @@
     </div>
     <div class="board-wrap">
       <div class="board" id="board"></div>
-      <div class="board-tabs"><i id="tab0" class="on"></i><i id="tab1"></i></div>
+      <div class="board-tabs"><span>←</span><i id="tab0" class="on"></i><i id="tab1"></i><span>→</span></div>
     </div>
     <div class="press">Press <kbd class="k1">1</kbd> for 1v1 · Press <kbd class="k2">2</kbd> for Solo</div>
     <div class="promo-line"><b>General Meeting 3 —</b> Startups 101 &amp; Google for Startups · Wed Oct 21 · 3–4 PM · LC 207 · Free pizza</div>
@@ -460,6 +462,9 @@
     boardIdx = 0;
     renderBoard();
     refreshBoards();
+    startBoardTimer();
+  }
+  function startBoardTimer() {
     clearInterval(boardTimer);
     boardTimer = setInterval(() => {
       boardIdx = 1 - boardIdx;
@@ -467,6 +472,14 @@
       if (boardIdx === 0) refreshBoards();
     }, BOARD_SWAP_MS);
   }
+  // ← / → or clicking the dots flips between the Solo and 1v1 boards (and restarts the 8 s auto-swap)
+  function showBoard(idx) {
+    boardIdx = idx;
+    renderBoard();
+    startBoardTimer();
+  }
+  $('tab0').addEventListener('click', () => showBoard(0));
+  $('tab1').addEventListener('click', () => showBoard(1));
 
   // ---------- shared play UI ----------
   function setWord(stim) {
@@ -712,6 +725,9 @@
     }
     if (e.repeat) return;
 
+    if (screen === 'attract' && (e.key === 'ArrowLeft' || e.key === 'ArrowRight')) {
+      e.preventDefault(); showBoard(1 - boardIdx); return;
+    }
     if (screen === 'attract' || (screen === 'result' && !pending)) {
       if (e.code === 'Digit1' || e.code === 'Numpad1') { e.preventDefault(); startVersus(); }
       else if (e.code === 'Digit2' || e.code === 'Numpad2') { e.preventDefault(); startSolo(); }
