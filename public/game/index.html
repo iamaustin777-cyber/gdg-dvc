@@ -168,6 +168,10 @@
   .mbtn.primary { background: var(--blue); color: #fff; }
   .mbtn:active { transform: scale(.97); }
   body.mobile #fsBtn { display: none; }
+  /* phones have no Esc key: show a way back to the menu everywhere except the menu itself */
+  #quitBtn { display: none; }
+  body.mobile:not([data-screen="attract"]) #quitBtn { display: inline-block; }
+  @media (max-width: 400px) { body.mobile:not([data-screen="attract"]) .brand-text { display: none; } }
   body.mobile .topbar { padding: max(12px, env(safe-area-inset-top)) 16px 6px; }
   body.mobile .brand { font-size: 15px; gap: 8px; }
   body.mobile .brand { white-space: nowrap; }
@@ -297,8 +301,9 @@
 <div class="pixels" id="pixels"></div>
 <div id="app">
   <header class="topbar">
-    <div class="brand"><span class="pix4"><b></b><b></b><b></b><b></b></span>GDG on Campus DVC<span class="mono">Color Rush</span></div>
+    <div class="brand"><span class="pix4"><b></b><b></b><b></b><b></b></span><span class="brand-text">GDG on Campus DVC</span><span class="mono">Color Rush</span></div>
     <div class="tools">
+      <button id="quitBtn" type="button" tabindex="-1">← Menu</button>
       <button id="fsBtn" type="button" tabindex="-1">Fullscreen</button>
       <button id="muteBtn" type="button" tabindex="-1">Sound: ON</button>
     </div>
@@ -979,6 +984,7 @@
     $('resSub').innerHTML = `You <b>${me}</b> · Opponent <b>${them}</b>`;
     if (me >= them) sfx.win(); else sfx.bad();
   }
+  $('quitBtn').addEventListener('click', (e) => { e.currentTarget.blur(); goAttract(); });
   $('olCreate').addEventListener('click', hostRoom);
   $('olJoin').addEventListener('click', joinRoom);
   $('olBack').addEventListener('click', goAttract);
