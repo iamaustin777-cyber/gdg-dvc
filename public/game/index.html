@@ -952,7 +952,7 @@
     const ol = OL;
     if (!ol) { goAttract(); return; }
     showResult({ head: `${g.score} POINT${g.score === 1 ? '' : 'S'}`, headColor: COLORS[0].hex,
-      sub: 'Waiting for your opponent to finish…', label: '', mode: 'online', value: null });
+      sub: 'Waiting for your opponent to finish…', label: 'Save your score to the Solo board', mode: 'online', value: g.score });
     const mine = ol.role === 'host' ? 'hostScore' : 'guestScore';
     const theirs = ol.role === 'host' ? 'guestScore' : 'hostScore';
     const started = now();
@@ -1002,10 +1002,11 @@
     $('resSub').innerHTML = r.sub;
     lastResultMode = r.mode;
     $('mAgain').textContent = r.mode === 'online' ? 'New room' : 'Play again';
-    const canSubmit = r.mode === 'solo'
+    // online 1v1 is the same 20-second round, so its scores go on the Solo board
+    const canSubmit = r.mode === 'solo' || r.mode === 'online'
       ? r.value >= 1
       : r.value !== null && r.value >= 100 && r.value <= 5000;
-    pending = canSubmit ? { mode: r.mode, value: r.value, busy: false } : null;
+    pending = canSubmit ? { mode: r.mode === 'online' ? 'solo' : r.mode, value: r.value, busy: false } : null;
     const input = $('nameIn');
     input.value = '';
     input.disabled = true;
@@ -1037,7 +1038,8 @@
       pending = null;
       $('resFoot').style.visibility = 'visible';
       boardIdx = p.mode === 'solo' ? 0 : 1;
-      later(2500, () => { if (screen === 'result') { goAttract(); boardIdx = p.mode === 'solo' ? 0 : 1; renderBoard(); } });
+      // online players stay put so they still see who won
+      if (lastResultMode !== 'online') later(2500, () => { if (screen === 'result') { goAttract(); boardIdx = p.mode === 'solo' ? 0 : 1; renderBoard(); } });
     } catch (err) {
       console.warn('Submit failed:', err);
       if (pending !== p) return;
