@@ -11,6 +11,41 @@ service cloud.firestore {
       allow update, delete: if false;
     }
 
+    // Color Rush online 1v1 rooms, keyed by a 4-digit code. A room holds the shared seed;
+    // the guest flag and each player's score can each be written exactly once.
+    // A code can be reused once its room is more than 2 hours old.
+    match /colorRushRooms/{code} {
+      allow get: if code.matches('^[0-9]{4}$');
+      allow list: if false;
+      allow create: if validNewRoom(code);
+      allow update: if (resource.data.createdAt < request.time - duration.value(2, 'h') && validNewRoom(code))
+                    || validRoomStep();
+      allow delete: if false;
+    }
+
+    function validNewRoom(code) {
+      let d = request.resource.data;
+      return code.matches('^[0-9]{4}$')
+        && d.keys().hasOnly(['seed', 'createdAt'])
+        && d.seed is int && d.seed >= 0 && d.seed <= 2147483647
+        && d.createdAt == request.time;
+    }
+
+    function validRoomStep() {
+      let d = request.resource.data;
+      let changed = d.diff(resource.data).affectedKeys();
+      return resource.data.createdAt > request.time - duration.value(2, 'h')
+        && changed.size() == 1
+        && changed.hasOnly(['guest', 'hostScore', 'guestScore'])
+        && (!changed.hasAny(['guest']) || (!('guest' in resource.data) && d.guest == true))
+        && (!changed.hasAny(['hostScore']) || (!('hostScore' in resource.data) && validRoomScore(d.hostScore)))
+        && (!changed.hasAny(['guestScore']) || (!('guestScore' in resource.data) && validRoomScore(d.guestScore)));
+    }
+
+    function validRoomScore(v) {
+      return v is int && v >= 0 && v <= 300;
+    }
+
     function validScore(d) {
       return d.name is string && d.name.size() >= 1 && d.name.size() <= 10
         && d.createdAt == request.time

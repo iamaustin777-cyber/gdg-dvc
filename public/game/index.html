@@ -264,6 +264,31 @@
     body.mobile .d3 { width: 20vh; height: 20vh; right: -6vh; top: 22vh; }
     body.mobile .d4 { width: 48vh; height: 48vh; border-width: 7vh; right: -22vh; bottom: -18vh; }
   }
+  /* online 1v1 (room code) */
+  #online { align-items: center; justify-content: center; padding: 12px 16px max(20px, env(safe-area-inset-bottom)); }
+  .ol-card { width: 100%; max-width: 420px; background: #fff; border: 1px solid var(--line); border-radius: 22px; box-shadow: 0 1px 3px rgba(60,64,67,.08);
+    padding: 30px 22px 22px; position: relative; overflow: hidden; text-align: center; }
+  .ol-card::before { content: ''; position: absolute; left: 0; right: 0; top: 0; height: 5px;
+    background: linear-gradient(90deg, var(--blue) 0 25%, var(--red) 0 50%, var(--yellow) 0 75%, var(--green) 0); }
+  .ol-view { display: flex; flex-direction: column; gap: 12px; }
+  .ol-tag { font-family: var(--f-mono); text-transform: uppercase; letter-spacing: .1em; font-size: 11px; color: var(--text-2); }
+  .ol-card h2 { margin: 0; font-size: 30px; font-weight: 500; letter-spacing: -.035em; }
+  .ol-card p { margin: 0; color: var(--text-2); font-size: 15px; line-height: 1.5; }
+  .ol-card p b { color: var(--text); font-weight: 600; }
+  .ol-or { font-family: var(--f-mono); text-transform: uppercase; letter-spacing: .1em; font-size: 11px; color: var(--text-3); margin-top: 8px; }
+  #olCode { font-family: var(--f-mono); font-size: 34px; letter-spacing: .45em; text-indent: .45em; text-align: center; padding: 10px; width: 100%;
+    border: 1px solid var(--line-2); border-radius: 16px; background: var(--surface-2); color: var(--text); outline: none; user-select: text; -webkit-user-select: text; }
+  #olCode:focus { border-color: var(--blue-hi); background: #fff; box-shadow: 0 0 0 3px rgba(26,115,232,.15); }
+  .ol-code { font-family: var(--f-mono); font-size: 68px; font-weight: 500; letter-spacing: .14em; text-indent: .14em; color: var(--blue); line-height: 1.1; }
+  .ol-msg { min-height: 21px; font-size: 14px; color: var(--text-2); }
+  .ol-msg.err { color: var(--red-hi); }
+  .ol-wait { display: flex; align-items: center; justify-content: center; gap: 8px; }
+  .ol-wait i { width: 8px; height: 8px; border-radius: 2px; animation: olDot 1.2s infinite; }
+  .ol-wait i:nth-child(1) { background: var(--blue); } .ol-wait i:nth-child(2) { background: var(--red); animation-delay: .15s; }
+  .ol-wait i:nth-child(3) { background: var(--yellow); animation-delay: .3s; } .ol-wait i:nth-child(4) { background: var(--green); animation-delay: .45s; }
+  @keyframes olDot { 50% { transform: translateY(-6px); } }
+  .mbtn.ghost { background: transparent; color: var(--text-2); }
+  .m-start .mbtn.second { font-size: 17px; padding: 14px 30px; background: var(--surface-2); color: var(--text); }
 </style>
 </head>
 <body>
@@ -289,7 +314,7 @@
       <div class="board-tabs"><span>←</span><i id="tab0" class="on"></i><i id="tab1"></i><span>→</span></div>
     </div>
     <div class="press d-only">Press <kbd class="k1">1</kbd> for 1v1 · Press <kbd class="k2">2</kbd> for Solo</div>
-    <div class="m-start m-only"><button class="mbtn primary" id="mSolo" type="button">Play Solo · 20s</button><small>Tap the color of the word, not what it says.<br />1v1 mode is on the laptops at our table!</small></div>
+    <div class="m-start m-only"><button class="mbtn primary" id="mSolo" type="button">Play Solo · 20s</button><button class="mbtn second" id="mOnline" type="button">Online 1v1 · room code</button><small>Tap the color of the word, not what it says.</small></div>
     <div class="promo-line"><b>General Meeting 3 —</b> Startups 101 &amp; Google for Startups · Wed Oct 21 · 3–4 PM · LC 207 · Free pizza</div>
   </section>
 
@@ -305,6 +330,30 @@
     <div class="keys k-left" id="keysL"></div>
     <div class="keys k-right" id="keysR"></div>
     <div class="pad m-only" id="pad"></div>
+  </section>
+
+  <section id="online" class="screen">
+    <div class="ol-card">
+      <div class="ol-view" id="olMenu">
+        <div class="ol-tag">Online 1v1</div>
+        <h2>Play a friend</h2>
+        <p>You both get the <b>same 20-second round</b> on your own phones. Higher score wins.</p>
+        <button class="mbtn primary" id="olCreate" type="button">Create room</button>
+        <div class="ol-or">or join a friend’s room</div>
+        <input id="olCode" inputmode="numeric" pattern="[0-9]*" maxlength="4" autocomplete="off" placeholder="0000" aria-label="4-digit room code" />
+        <button class="mbtn" id="olJoin" type="button">Join room</button>
+        <div class="ol-msg" id="olMsg"></div>
+        <button class="mbtn ghost" id="olBack" type="button">Back</button>
+      </div>
+      <div class="ol-view" id="olHost" style="display:none">
+        <div class="ol-tag">Your room code</div>
+        <div class="ol-code" id="olCodeShow">----</div>
+        <p>Have your friend open <b style="white-space:nowrap">gdg-dvc.web.app/game</b>, tap <b>Online 1v1</b> and enter this code.</p>
+        <div class="ol-wait"><i></i><i></i><i></i><i></i></div>
+        <p>Waiting for your opponent…</p>
+        <button class="mbtn" id="olCancel" type="button">Cancel</button>
+      </div>
+    </div>
   </section>
 
   <section id="result" class="screen">
@@ -380,10 +429,10 @@
   function later(ms, fn) { const t = setTimeout(fn, ms); timers.push(t); return t; }
   function clearTimers() { timers.forEach(clearTimeout); timers = []; }
 
-  function nextStim(prev) {
+  function nextStim(prev, rng = Math.random) {
     for (;;) {
-      const ink = rnd(4);
-      const word = Math.random() < MISMATCH ? (ink + 1 + rnd(3)) % 4 : ink;
+      const ink = Math.floor(rng() * 4);
+      const word = rng() < MISMATCH ? (ink + 1 + Math.floor(rng() * 3)) % 4 : ink;
       if (!prev || prev.ink !== ink || prev.word !== word) return { word, ink };
     }
   }
@@ -459,7 +508,7 @@
   function show(id) {
     screen = id;
     document.body.dataset.screen = id;
-    ['attract', 'play', 'result'].forEach((s) => $(s).classList.toggle('on', s === id));
+    ['attract', 'play', 'online', 'result'].forEach((s) => $(s).classList.toggle('on', s === id));
   }
 
   // ---------- leaderboard ----------
@@ -567,6 +616,7 @@
   function goAttract() {
     clearTimers();
     G = null;
+    OL = null;
     $('nameIn').blur();
     show('attract');
     boardIdx = 0;
@@ -710,9 +760,10 @@
   }
 
   // ---------- solo ----------
-  function startSolo() {
+  function startSolo(opts = {}) {
     clearTimers();
-    G = { mode: 'solo', score: 0, combo: 0, bestCombo: 0, stim: null, active: false, over: false, endAt: 0 };
+    G = { mode: 'solo', score: 0, combo: 0, bestCombo: 0, stim: null, active: false, over: false, endAt: 0,
+      online: !!opts.online, rng: opts.rng || Math.random };
     show('play');
     resetPlayUI();
     $('whoL').textContent = 'SCORE'; $('whoR').textContent = 'TIME';
@@ -722,7 +773,7 @@
       const g = G;
       g.endAt = now() + SOLO_MS;
       g.active = true;
-      g.stim = nextStim(null);
+      g.stim = nextStim(null, g.rng);
       setWord(g.stim);
       runTimerBar(SOLO_MS);
       const tick = () => {
@@ -752,12 +803,13 @@
     }
     $('bigL').textContent = g.score;
     $('combo').textContent = g.combo >= 5 ? `COMBO ×${g.combo}` : '';
-    g.stim = nextStim(g.stim);
+    g.stim = nextStim(g.stim, g.rng);
     setWord(g.stim);
   }
   function endSolo() {
     const g = G;
     g.over = true; g.active = false;
+    if (g.online) { endOnline(g); return; }
     sfx.win();
     showResult({
       head: `${g.score} POINT${g.score === 1 ? '' : 'S'}`,
@@ -769,14 +821,181 @@
     });
   }
 
+  // ---------- online 1v1 (room code) ----------
+  // No live connection: both phones play the same seeded 20-second round,
+  // then swap scores through a small Firestore room document (polled every second).
+  const ROOMS = 'colorRushRooms';
+  const ROOM_TTL_MS = 2 * 60 * 60 * 1000;
+  let OL = null; // { code, seed, role: 'host' | 'guest' }
+  let olBusy = false;
+
+  function mulberry32(a) {
+    return () => {
+      a = (a + 0x6D2B79F5) | 0;
+      let t = Math.imul(a ^ (a >>> 15), 1 | a);
+      t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t;
+      return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+    };
+  }
+  async function fsReq(method, path, body, ms = 6000) {
+    const ctl = new AbortController();
+    const t = setTimeout(() => ctl.abort(), ms);
+    try {
+      const r = await fetch(`${API}${path}`, {
+        method, headers: { 'Content-Type': 'application/json' },
+        body: body ? JSON.stringify(body) : undefined, signal: ctl.signal,
+      });
+      return { status: r.status, json: await r.json().catch(() => null) };
+    } finally { clearTimeout(t); }
+  }
+  const intOf = (v) => (v ? Number(v.integerValue ?? v.doubleValue) : null);
+  async function getRoom(code) {
+    const r = await fsReq('GET', `/${ROOMS}/${code}`);
+    if (r.status === 404) return null;
+    if (r.status !== 200) throw new Error(`HTTP ${r.status}`);
+    const f = r.json.fields || {};
+    return {
+      seed: intOf(f.seed), guest: !!(f.guest && f.guest.booleanValue),
+      hostScore: intOf(f.hostScore), guestScore: intOf(f.guestScore),
+      createdAt: Date.parse((f.createdAt && f.createdAt.timestampValue) || 0), updateTime: r.json.updateTime,
+    };
+  }
+  async function createRoom() {
+    for (let i = 0; i < 6; i++) {
+      const code = String(rnd(10000)).padStart(4, '0');
+      const seed = rnd(2147483647);
+      const write = {
+        update: { name: `${DB_PATH}/${ROOMS}/${code}`, fields: { seed: { integerValue: String(seed) } } },
+        updateTransforms: [{ fieldPath: 'createdAt', setToServerValue: 'REQUEST_TIME' }],
+      };
+      let r = await fsReq('POST', ':commit', { writes: [{ ...write, currentDocument: { exists: false } }] });
+      if (r.status === 200) return { code, seed };
+      // code already used: take it over only if that room is old
+      const old = await getRoom(code).catch(() => null);
+      if (old && Date.now() - old.createdAt > ROOM_TTL_MS) {
+        r = await fsReq('POST', ':commit', { writes: [{ ...write, currentDocument: { updateTime: old.updateTime } }] });
+        if (r.status === 200) return { code, seed };
+      }
+    }
+    throw new Error('no free room code');
+  }
+  async function setRoomField(code, field, value) {
+    const v = typeof value === 'boolean' ? { booleanValue: value } : { integerValue: String(value) };
+    const r = await fsReq('PATCH', `/${ROOMS}/${code}?updateMask.fieldPaths=${field}&currentDocument.exists=true`, { fields: { [field]: v } });
+    if (r.status !== 200) throw new Error(`HTTP ${r.status}`);
+  }
+
+  function olView(id) { ['olMenu', 'olHost'].forEach((v) => { $(v).style.display = v === id ? '' : 'none'; }); }
+  function olMsg(text, err) { $('olMsg').textContent = text; $('olMsg').classList.toggle('err', !!err); }
+  function openOnline() {
+    clearTimers();
+    G = null; OL = null; olBusy = false;
+    show('online');
+    olView('olMenu');
+    olMsg('');
+    $('olCode').value = '';
+  }
+  async function hostRoom() {
+    if (olBusy) return;
+    olBusy = true;
+    olMsg('Creating room…');
+    try {
+      const room = await createRoom();
+      if (screen !== 'online') return;
+      const ol = { ...room, role: 'host' };
+      OL = ol;
+      $('olCodeShow').textContent = ol.code;
+      olView('olHost');
+      const poll = async () => {
+        if (OL !== ol || screen !== 'online') return;
+        try {
+          const r = await getRoom(ol.code);
+          if (OL !== ol || screen !== 'online') return;
+          if (r && r.guest) { startSolo({ online: true, rng: mulberry32(ol.seed) }); return; }
+        } catch {}
+        later(1000, poll);
+      };
+      poll();
+    } catch (err) {
+      console.warn('Create room failed:', err);
+      olMsg('Couldn’t create a room. Check your connection.', true);
+    } finally { olBusy = false; }
+  }
+  async function joinRoom() {
+    const code = $('olCode').value.replace(/\D/g, '').slice(0, 4);
+    if (code.length !== 4) { olMsg('Enter the 4-digit code', true); return; }
+    if (olBusy) return;
+    olBusy = true;
+    olMsg('Joining…');
+    $('olCode').blur();
+    try {
+      const r = await getRoom(code);
+      if (!r || Date.now() - r.createdAt > ROOM_TTL_MS) olMsg('No room with that code', true);
+      else if (r.guest) olMsg('That room is already full', true);
+      else {
+        await setRoomField(code, 'guest', true);
+        if (screen !== 'online') return;
+        OL = { code, seed: r.seed, role: 'guest' };
+        startSolo({ online: true, rng: mulberry32(r.seed) });
+      }
+    } catch (err) {
+      console.warn('Join failed:', err);
+      olMsg('Couldn’t join. Check the code and your connection.', true);
+    } finally { olBusy = false; }
+  }
+  function endOnline(g) {
+    const ol = OL;
+    if (!ol) { goAttract(); return; }
+    showResult({ head: `${g.score} POINT${g.score === 1 ? '' : 'S'}`, headColor: COLORS[0].hex,
+      sub: 'Waiting for your opponent to finish…', label: '', mode: 'online', value: null });
+    const mine = ol.role === 'host' ? 'hostScore' : 'guestScore';
+    const theirs = ol.role === 'host' ? 'guestScore' : 'hostScore';
+    const started = now();
+    let sendTries = 0;
+    const poll = async () => {
+      if (OL !== ol || screen !== 'result') return;
+      try {
+        const r = await getRoom(ol.code);
+        if (OL !== ol || screen !== 'result') return;
+        if (r && r[theirs] !== null) { showOnlineOutcome(g.score, r[theirs]); return; }
+      } catch {}
+      if (now() - started > 90000) { $('resSub').textContent = 'Your opponent didn’t finish.'; return; }
+      later(1000, poll);
+    };
+    const send = async () => {
+      try { await setRoomField(ol.code, mine, g.score); poll(); }
+      catch (err) {
+        if (OL !== ol) return;
+        if (++sendTries < 8) later(1500, send);
+        else $('resSub').textContent = 'Connection lost. Couldn’t compare scores.';
+      }
+    };
+    send();
+  }
+  function showOnlineOutcome(me, them) {
+    const head = me > them ? 'YOU WIN' : me < them ? 'YOU LOSE' : 'TIE';
+    $('resHead').textContent = head;
+    $('resHead').style.color = me > them ? COLORS[3].hex : me < them ? COLORS[1].hex : COLORS[0].hex;
+    $('resSub').innerHTML = `You <b>${me}</b> · Opponent <b>${them}</b>`;
+    if (me >= them) sfx.win(); else sfx.bad();
+  }
+  $('olCreate').addEventListener('click', hostRoom);
+  $('olJoin').addEventListener('click', joinRoom);
+  $('olBack').addEventListener('click', goAttract);
+  $('olCancel').addEventListener('click', openOnline);
+  $('olCode').addEventListener('keydown', (e) => { if (e.key === 'Enter') { e.preventDefault(); joinRoom(); } });
+
   // ---------- result ----------
   let pending = null; // what the name entry would submit
+  let lastResultMode = 'solo';
   function showResult(r) {
     clearTimers();
     show('result');
     $('resHead').textContent = r.head;
     $('resHead').style.color = r.headColor;
     $('resSub').innerHTML = r.sub;
+    lastResultMode = r.mode;
+    $('mAgain').textContent = r.mode === 'online' ? 'New room' : 'Play again';
     const canSubmit = r.mode === 'solo'
       ? r.value >= 1
       : r.value !== null && r.value >= 100 && r.value <= 5000;
@@ -844,9 +1063,10 @@
     e.preventDefault();
     if (screen === 'play' && G && G.mode === 'solo') soloKey(0, Number(b.dataset.c));
   });
-  $('mSolo').addEventListener('click', startSolo);
+  $('mSolo').addEventListener('click', () => startSolo());
+  $('mOnline').addEventListener('click', openOnline);
   $('mSave').addEventListener('click', trySubmit);
-  $('mAgain').addEventListener('click', startSolo);
+  $('mAgain').addEventListener('click', () => (lastResultMode === 'online' ? openOnline() : startSolo()));
   $('mMenu').addEventListener('click', goAttract);
   document.addEventListener('keydown', (e) => {
     lastInput = now();
@@ -878,7 +1098,7 @@
 
   // unattended laptop: drift back to the attract screen
   setInterval(() => {
-    if (screen !== 'attract' && now() - lastInput > IDLE_MS) goAttract();
+    if (screen !== 'attract' && !OL && now() - lastInput > IDLE_MS) goAttract();
   }, 1000);
 
   // test hook for automated play-throughs
