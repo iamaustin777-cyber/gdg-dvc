@@ -381,7 +381,9 @@
       });
       boards[mode] = rows.filter((r) => r.document).map((r) => {
         const f = r.document.fields || {};
-        return { name: (f.name && f.name.stringValue) || '?', value: Number((f[field] && f[field].integerValue) || 0) };
+        // entries added or edited by hand in the Firebase console may be stored as doubles
+        const v = f[field] || {};
+        return { name: (f.name && f.name.stringValue) || '?', value: Math.round(Number(v.integerValue ?? v.doubleValue ?? 0)) };
       });
     } catch (err) {
       console.warn('Leaderboard offline:', err);
